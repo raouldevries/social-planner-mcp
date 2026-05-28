@@ -1,0 +1,111 @@
+{
+  "source": "Issuekalender 2026 - Rud Pedersen",
+  "year": 2026,
+  "events": [
+    { "date": "2026-01-01", "title": "Nieuwjaarsdag", "description": "Nationale feestdag" },
+    { "date": "2026-01-06", "title": "Driekoningen", "description": "Epifanie" },
+    {
+      "date": "2026-01-27",
+      "title": "Holocaust Herdenkingsdag",
+      "description": "Internationale herdenkingsdag"
+    },
+
+    { "date": "2026-02-14", "title": "Valentijnsdag", "description": "Dag van de liefde" },
+    { "date": "2026-02-15", "title": "Carnaval", "description": "Start carnaval (zondag)" },
+    { "date": "2026-02-16", "title": "Carnaval", "description": "Carnaval maandag" },
+    { "date": "2026-02-17", "title": "Carnaval", "description": "Carnaval dinsdag" },
+    { "date": "2026-02-18", "title": "Aswoensdag", "description": "Start Vastentijd" },
+
+    {
+      "date": "2026-03-08",
+      "title": "Internationale Vrouwendag",
+      "description": "VN-dag voor vrouwenrechten"
+    },
+    {
+      "date": "2026-03-17",
+      "title": "Tweede Kamerverkiezingen",
+      "description": "Nederlandse verkiezingen (indien gepland)"
+    },
+    { "date": "2026-03-29", "title": "Zomertijd", "description": "Klok 1 uur vooruit" },
+
+    { "date": "2026-04-02", "title": "Witte Donderdag", "description": "Christelijke feestdag" },
+    { "date": "2026-04-03", "title": "Goede Vrijdag", "description": "Christelijke feestdag" },
+    { "date": "2026-04-05", "title": "Eerste Paasdag", "description": "Nationale feestdag" },
+    { "date": "2026-04-06", "title": "Tweede Paasdag", "description": "Nationale feestdag" },
+    { "date": "2026-04-21", "title": "Secretaressedag", "description": "Dag van de secretaresse" },
+    {
+      "date": "2026-04-22",
+      "title": "Dag van de Aarde",
+      "description": "Internationale milieudag"
+    },
+    { "date": "2026-04-27", "title": "Koningsdag", "description": "Nationale feestdag" },
+
+    {
+      "date": "2026-05-01",
+      "title": "Dag van de Arbeid",
+      "description": "Internationale feestdag"
+    },
+    { "date": "2026-05-04", "title": "Dodenherdenking", "description": "Nationale herdenking" },
+    { "date": "2026-05-05", "title": "Bevrijdingsdag", "description": "Nationale feestdag" },
+    { "date": "2026-05-09", "title": "Europadag", "description": "Dag van de Europese Unie" },
+    { "date": "2026-05-10", "title": "Moederdag", "description": "Dag voor moeders" },
+    { "date": "2026-05-14", "title": "Hemelvaartsdag", "description": "Nationale feestdag" },
+    { "date": "2026-05-24", "title": "Eerste Pinksterdag", "description": "Nationale feestdag" },
+    { "date": "2026-05-25", "title": "Tweede Pinksterdag", "description": "Nationale feestdag" },
+
+    { "date": "2026-06-05", "title": "Wereldmilieudag", "description": "VN-dag voor milieu" },
+    { "date": "2026-06-21", "title": "Vaderdag", "description": "Dag voor vaders" },
+    { "date": "2026-06-21", "title": "Langste dag", "description": "Zomerzonnewende" },
+    { "date": "2026-06-28", "title": "Pride Amsterdam start", "description": "LGBTQ+ evenement" },
+
+    {
+      "date": "2026-07-01",
+      "title": "Start zomervakantie (regio Zuid)",
+      "description": "Schoolvakantie"
+    },
+    { "date": "2026-07-04", "title": "Pride Amsterdam", "description": "Canal Parade weekend" },
+
+    { "date": "2026-08-15", "title": "Maria Hemelvaart", "description": "Christelijke feestdag" },
+    { "date": "2026-08-31", "title": "Einde zomervakantie", "description": "Meeste regio's" },
+
+    { "date": "2026-09-01", "title": "Start politiek seizoen", "description": "Prinsjesdag-maand" },
+    {
+      "date": "2026-09-15",
+      "title": "Prinsjesdag",
+      "description": "Opening parlementair jaar, Troonrede"
+    },
+    {
+      "date": "2026-09-21",
+      "title": "Internationale Dag van de Vrede",
+      "description": "VN-vredesdag"
+    },
+
+    { "date": "2026-10-03", "title": "Dierendag", "description": "Dag voor dierenwelzijn" },
+    { "date": "2026-10-05", "title": "Werelddocentendag", "description": "Dag voor onderwijzers" },
+    { "date": "2026-10-25", "title": "Wintertijd", "description": "Klok 1 uur terug" },
+    { "date": "2026-10-31", "title": "Halloween", "description": "Internationale viering" },
+
+    { "date": "2026-11-01", "title": "Allerheiligen", "description": "Christelijke feestdag" },
+    { "date": "2026-11-02", "title": "Allerzielen", "description": "Christelijke herdenkingsdag" },
+    { "date": "2026-11-11", "title": "Sint-Maarten", "description": "Lampionnenoptocht" },
+    {
+      "date": "2026-11-15",
+      "title": "Intocht Sinterklaas",
+      "description": "Landelijke intocht (verwacht)"
+    },
+    {
+      "date": "2026-11-25",
+      "title": "Internationale Dag tegen Geweld tegen Vrouwen",
+      "description": "VN-dag"
+    },
+    { "date": "2026-11-27", "title": "Black Friday", "description": "Koopjesdag" },
+
+    { "date": "2026-12-05", "title": "Sinterklaasavond", "description": "Pakjesavond" },
+    { "date": "2026-12-10", "title": "Dag van de Mensenrechten", "description": "VN-dag" },
+    { "date": "2026-12-21", "title": "Kortste dag", "description": "Winterzonnewende" },
+    { "date": "2026-12-24", "title": "Kerstavond", "description": "Avond voor Kerst" },
+    { "date": "2026-12-25", "title": "Eerste Kerstdag", "description": "Nationale feestdag" },
+    { "date": "2026-12-26", "title": "Tweede Kerstdag", "description": "Nationale feestdag" },
+    { "date": "2026-12-31", "title": "Oudejaarsdag", "description": "Laatste dag van het jaar" }
+  ]
+}

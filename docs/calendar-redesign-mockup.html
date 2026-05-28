@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar Redesign - Editorial Planning Canvas</title>
+
+  <!-- Distinctive fonts: Playfair Display for editorial feel + DM Sans for clean body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Color palette - warm neutrals with purposeful accents */
+      --bg-base: #fafaf9;
+      --bg-calendar: #ffffff;
+      --bg-weekend: #f5f5f4;
+      --bg-today: linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%);
+      --bg-hover: #f8fafc;
+
+      --border-subtle: #e7e5e4;
+      --border-medium: #d6d3d1;
+
+      --text-primary: #1c1917;
+      --text-secondary: #57534e;
+      --text-tertiary: #a8a29e;
+      --text-muted: #d6d3d1;
+
+      /* Status colors */
+      --status-draft: #94a3b8;
+      --status-pending: #f59e0b;
+      --status-approved: #10b981;
+      --status-scheduled: #3b82f6;
+      --status-published: #8b5cf6;
+
+      /* Platform colors */
+      --linkedin: #0a66c2;
+      --instagram: #e4405f;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.08);
+      --shadow-hover: 0 8px 25px rgba(0,0,0,0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 40px;
+
+      /* Subtle noise texture for atmosphere */
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-blend-mode: overlay;
+      background-size: 200px;
+    }
+
+    .calendar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ============================================
+       HEADER - Editorial Style
+       ============================================ */
+    .calendar-header {
+      margin-bottom: 32px;
+      padding: 32px 40px;
+      background: linear-gradient(135deg, #ffffff 0%, #fefefe 50%, #faf5ff 100%);
+      border-radius: 20px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-subtle);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .calendar-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle at center, rgba(139, 92, 246, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .month-display {
+      position: relative;
+    }
+
+    .month-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 56px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .year-display {
+      font-size: 20px;
+      font-weight: 300;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1em;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 4px;
+    }
+
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border-subtle);
+      background: white;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      color: var(--text-secondary);
+    }
+
+    .nav-btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-medium);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .view-toggle {
+      display: flex;
+      background: var(--bg-base);
+      border-radius: 12px;
+      padding: 4px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .view-btn {
+      padding: 10px 20px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .view-btn.active {
+      background: white;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .view-btn:hover:not(.active) {
+      color: var(--text-primary);
+    }
+
+    .view-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.7;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .stat-dot.scheduled { background: var(--status-scheduled); }
+    .stat-dot.pending { background: var(--status-pending); }
+    .stat-dot.draft { background: var(--status-draft); }
+
+    .stat-number {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ============================================
+       CALENDAR GRID
+       ============================================ */
+    .calendar-grid {
+      background: var(--bg-calendar);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .day-headers {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: linear-gradient(180deg, #fafaf9 0%, #f5f5f4 100%);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .day-header {
+      padding: 16px 12px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-tertiary);
+    }
+
+    .day-header .first-letter {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .calendar-body {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .calendar-cell {
+      min-height: 140px;
+      border-right: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 8px;
+      position: relative;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .calendar-cell:nth-child(7n) {
+      border-right: none;
+    }
+
+    .calendar-cell:hover {
+      background: var(--bg-hover);
+    }
+
+    .calendar-cell:hover .add-post-hint {
+      opacity: 1;
+    }
+
+    .calendar-cell.weekend {
+      background: var(--bg-weekend);
+    }
+
+    .calendar-cell.weekend:hover {
+      background: #f0efed;
+    }
+
+    .calendar-cell.other-month {
+      background: #fcfcfb;
+    }
+
+    .calendar-cell.other-month .date-number {
+      color: var(--text-muted);
+    }
+
+    .calendar-cell.today {
+      background: var(--bg-today);
+    }
+
+    .calendar-cell.today:hover {
+      background: linear-gradient(135deg, #bfdbfe 0%, #ddd6fe 100%);
+    }
+
+    .date-number {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .calendar-cell.today .date-number {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .today-badge {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--status-scheduled);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .post-count-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 20px;
+      height: 20px;
+      background: var(--text-tertiary);
+      color: white;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .add-post-hint {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      background: var(--status-scheduled);
+      color: white;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      font-size: 16px;
+      font-weight: 300;
+    }
+
+    /* ============================================
+       EVENT CARDS - Enhanced
+       ============================================ */
+    .event-card {
+      background: white;
+      border-radius: 8px;
+      padding: 10px 10px 10px 14px;
+      margin-bottom: 6px;
+      border: 1px solid var(--border-subtle);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .event-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--border-medium);
+    }
+
+    .event-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+    }
+
+    .event-card.status-draft::before { background: var(--status-draft); }
+    .event-card.status-pending::before { background: var(--status-pending); }
+    .event-card.status-approved::before { background: var(--status-approved); }
+    .event-card.status-scheduled::before { background: var(--status-scheduled); }
+    .event-card.status-published::before { background: var(--status-published); }
+
+    .event-time {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+      letter-spacing: 0.02em;
+    }
+
+    .event-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.4;
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .event-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .platform-badges {
+      display: flex;
+      gap: 4px;
+    }
+
+    .platform-badge {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+
+    .platform-badge.linkedin {
+      background: rgba(10, 102, 194, 0.1);
+      color: var(--linkedin);
+    }
+
+    .platform-badge.instagram {
+      background: rgba(228, 64, 95, 0.1);
+      color: var(--instagram);
+    }
+
+    .status-pill {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-pill.draft {
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--status-draft);
+    }
+
+    .status-pill.pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--status-pending);
+    }
+
+    .status-pill.approved {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--status-approved);
+    }
+
+    .status-pill.scheduled {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--status-scheduled);
+    }
+
+    .status-dot-small {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* ============================================
+       COMPARISON TOGGLE
+       ============================================ */
+    .comparison-bar {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text-primary);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      z-index: 100;
+    }
+
+    .comparison-bar span {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    .comparison-toggle {
+      display: flex;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 4px;
+    }
+
+    .comparison-btn {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .comparison-btn.active {
+      background: white;
+      color: var(--text-primary);
+    }
+
+    .comparison-btn:hover:not(.active) {
+      color: white;
+    }
+
+    /* ============================================
+       BEFORE STATE (for comparison)
+       ============================================ */
+    .before-state {
+      display: none;
+    }
+
+    .before-state.visible {
+      display: block;
+    }
+
+    .after-state.hidden {
+      display: none;
+    }
+
+    .before-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding: 16px 0;
+    }
+
+    .before-header h2 {
+      font-size: 18px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .before-header .nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .before-header button {
+      padding: 8px 12px;
+      border: 1px solid #e5e7eb;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .before-toggle {
+      display: flex;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .before-toggle button {
+      padding: 8px 16px;
+      border: none;
+      background: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .before-toggle button.active {
+      background: #f3f4f6;
+    }
+
+    .before-calendar {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .before-day-headers {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: #f9fafb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .before-day-header {
+      padding: 12px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      color: #6b7280;
+      text-transform: uppercase;
+    }
+
+    .before-body {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .before-cell {
+      min-height: 120px;
+      border-right: 1px solid #e5e7eb;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 8px;
+    }
+
+    .before-cell:nth-child(7n) {
+      border-right: none;
+    }
+
+    .before-cell.weekend {
+      background: #f9fafb;
+    }
+
+    .before-cell.other-month .before-date {
+      color: #d1d5db;
+    }
+
+    .before-date {
+      font-size: 14px;
+      color: #374151;
+      margin-bottom: 4px;
+    }
+
+    .before-date.today {
+      background: #3b82f6;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .before-event {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-left: 3px solid #3b82f6;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .before-event-icons {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+
+    .before-event-title {
+      color: #374151;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      body {
+        padding: 16px;
+      }
+
+      .month-name {
+        font-size: 36px;
+      }
+
+      .calendar-cell {
+        min-height: 100px;
+        padding: 6px;
+      }
+
+      .event-card {
+        padding: 6px 6px 6px 10px;
+      }
+
+      .event-title {
+        font-size: 11px;
+        -webkit-line-clamp: 1;
+      }
+
+      .event-meta {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- AFTER STATE (Redesigned) -->
+  <div class="after-state" id="afterState">
+    <div class="calendar-container">
+
+      <!-- Enhanced Header -->
+      <header class="calendar-header">
+        <div class="header-top">
+          <div class="month-display">
+            <h1 class="month-name">January</h1>
+            <span class="year-display">2026</span>
+          </div>
+
+          <div class="header-controls">
+            <div class="nav-buttons">
+              <button class="nav-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+              </button>
+              <button class="nav-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="view-toggle">
+              <button class="view-btn">
+                <svg class="view-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+                </svg>
+                List
+              </button>
+              <button class="view-btn active">
+                <svg class="view-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Calendar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-stats">
+          <div class="stat-item">
+            <span class="stat-dot scheduled"></span>
+            <span><span class="stat-number">12</span> scheduled</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-dot pending"></span>
+            <span><span class="stat-number">3</span> pending approval</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-dot draft"></span>
+            <span><span class="stat-number">5</span> drafts</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Calendar Grid -->
+      <div class="calendar-grid">
+        <div class="day-headers">
+          <div class="day-header"><span class="first-letter">S</span>un</div>
+          <div class="day-header"><span class="first-letter">M</span>on</div>
+          <div class="day-header"><span class="first-letter">T</span>ue</div>
+          <div class="day-header"><span class="first-letter">W</span>ed</div>
+          <div class="day-header"><span class="first-letter">T</span>hu</div>
+          <div class="day-header"><span class="first-letter">F</span>ri</div>
+          <div class="day-header"><span class="first-letter">S</span>at</div>
+        </div>
+
+        <div class="calendar-body">
+          <!-- Week 1 -->
+          <div class="calendar-cell weekend other-month"><div class="date-number">28</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell other-month"><div class="date-number">29</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell other-month"><div class="date-number">30</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell other-month"><div class="date-number">31</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell"><div class="date-number">1</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell"><div class="date-number">2</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell weekend"><div class="date-number">3</div><span class="add-post-hint">+</span></div>
+
+          <!-- Week 2 -->
+          <div class="calendar-cell weekend"><div class="date-number">4</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell"><div class="date-number">5</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell">
+            <div class="date-number">6</div>
+            <div class="event-card status-published">
+              <div class="event-time">09:00</div>
+              <div class="event-title">New year, new beginnings for maritime industry</div>
+              <div class="event-meta">
+                <div class="platform-badges">
+                  <span class="platform-badge linkedin">in</span>
+                </div>
+                <span class="status-pill published"><span class="status-dot-small"></span>Published</span>
+              </div>
+            </div>
+            <span class="add-post-hint">+</span>
+          </div>
+          <div class="calendar-cell"><div class="date-number">7</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell">
+            <div class="date-number">8</div>
+            <span class="post-count-badge">2</span>
+            <div class="event-card status-scheduled">
+              <div class="event-time">10:30</div>
+              <div class="event-title">Winter shipping routes update</div>
+              <div class="event-meta">
+                <div class="platform-badges">
+                  <span class="platform-badge linkedin">in</span>
+                  <span class="platform-badge instagram">ig</span>
+                </div>
+                <span class="status-pill scheduled"><span class="status-dot-small"></span>Scheduled</span>
+              </div>
+            </div>
+            <span class="add-post-hint">+</span>
+          </div>
+          <div class="calendar-cell"><div class="date-number">9</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell weekend"><div class="date-number">10</div><span class="add-post-hint">+</span></div>
+
+          <!-- Week 3 -->
+          <div class="calendar-cell weekend"><div class="date-number">11</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell"><div class="date-number">12</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell">
+            <div class="date-number">13</div>
+            <div class="event-card status-approved">
+              <div class="event-time">14:00</div>
+              <div class="event-title">Team spotlight: Meet our logistics experts</div>
+              <div class="event-meta">
+                <div class="platform-badges">
+                  <span class="platform-badge instagram">ig</span>
+                </div>
+                <span class="status-pill approved"><span class="status-dot-small"></span>Approved</span>
+              </div>
+            </div>
+            <span class="add-post-hint">+</span>
+          </div>
+          <div class="calendar-cell"><div class="date-number">14</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell"><div class="date-number">15</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell">
+            <div class="date-number">16</div>
+            <div class="event-card status-pending">
+              <div class="event-time">11:00</div>
+              <div class="event-title">Sustainability report 2025 highlights</div>
+              <div class="event-meta">
+                <div class="platform-badges">
+                  <span class="platform-badge linkedin">in</span>
+                </div>
+                <span class="status-pill pending"><span class="status-dot-small"></span>Pending</span>
+              </div>
+            </div>
+            <span class="add-post-hint">+</span>
+          </div>
+          <div class="calendar-cell weekend"><div class="date-number">17</div><span class="add-post-hint">+</span></div>
+
+          <!-- Week 4 (Today is 19th) -->
+          <div class="calendar-cell weekend"><div class="date-number">18</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell today">
+            <div class="date-number">19 <span class="today-badge">Today</span></div>
+            <div class="event-card status-scheduled">
+              <div class="event-time">09:30</div>
+              <div class="event-title">Waarom kiezen steeds meer bedrijven voor duurzame scheepvaart?</div>
+              <div class="event-meta">
+                <div class="platform-badges">
+                  <span class="platform-badge linkedin">in</span>
+                  <span class="platform-badge instagram">ig</span>
+                </div>
+                <span class="status-pill scheduled"><span class="status-dot-small"></span>Scheduled</span>
+              </div>
+            </div>
+            <span class="add-post-hint">+</span>
+          </div>
+          <div class="calendar-cell">
+            <div class="date-number">20</div>
+            <div class="event-card status-draft">
+              <div class="event-time">—</div>
+              <div class="event-title">Behind the scenes: Port operations</div>
+              <div class="event-meta">
+                <div class="platform-badges">
+                  <span class="platform-badge instagram">ig</span>
+                </div>
+                <span class="status-pill draft"><span class="status-dot-small"></span>Draft</span>
+              </div>
+            </div>
+            <span class="add-post-hint">+</span>
+          </div>
+          <div class="calendar-cell"><div class="date-number">21</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell">
+            <div class="date-number">22</div>
+            <div class="event-card status-pending">
+              <div class="event-time">15:00</div>
+              <div class="event-title">Q1 industry outlook and predictions</div>
+              <div class="event-meta">
+                <div class="platform-badges">
+                  <span class="platform-badge linkedin">in</span>
+                </div>
+                <span class="status-pill pending"><span class="status-dot-small"></span>Pending</span>
+              </div>
+            </div>
+            <span class="add-post-hint">+</span>
+          </div>
+          <div class="calendar-cell"><div class="date-number">23</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell weekend"><div class="date-number">24</div><span class="add-post-hint">+</span></div>
+
+          <!-- Week 5 -->
+          <div class="calendar-cell weekend"><div class="date-number">25</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell"><div class="date-number">26</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell">
+            <div class="date-number">27</div>
+            <div class="event-card status-draft">
+              <div class="event-time">—</div>
+              <div class="event-title">Employee anniversary celebration</div>
+              <div class="event-meta">
+                <div class="platform-badges">
+                  <span class="platform-badge linkedin">in</span>
+                  <span class="platform-badge instagram">ig</span>
+                </div>
+                <span class="status-pill draft"><span class="status-dot-small"></span>Draft</span>
+              </div>
+            </div>
+            <span class="add-post-hint">+</span>
+          </div>
+          <div class="calendar-cell"><div class="date-number">28</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell"><div class="date-number">29</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell">
+            <div class="date-number">30</div>
+            <div class="event-card status-scheduled">
+              <div class="event-time">10:00</div>
+              <div class="event-title">Monthly newsletter announcement</div>
+              <div class="event-meta">
+                <div class="platform-badges">
+                  <span class="platform-badge linkedin">in</span>
+                </div>
+                <span class="status-pill scheduled"><span class="status-dot-small"></span>Scheduled</span>
+              </div>
+            </div>
+            <span class="add-post-hint">+</span>
+          </div>
+          <div class="calendar-cell weekend"><div class="date-number">31</div><span class="add-post-hint">+</span></div>
+
+          <!-- Week 6 (next month) -->
+          <div class="calendar-cell weekend other-month"><div class="date-number">1</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell other-month"><div class="date-number">2</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell other-month"><div class="date-number">3</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell other-month"><div class="date-number">4</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell other-month"><div class="date-number">5</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell other-month"><div class="date-number">6</div><span class="add-post-hint">+</span></div>
+          <div class="calendar-cell weekend other-month"><div class="date-number">7</div><span class="add-post-hint">+</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BEFORE STATE (Original) -->
+  <div class="before-state" id="beforeState">
+    <div class="calendar-container">
+
+      <div class="before-header">
+        <h2>
+          <button style="border: 1px solid #e5e7eb; background: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">‹</button>
+          January 2026
+          <button style="border: 1px solid #e5e7eb; background: white; padding: 4px 8px; border-radius: 4px; cursor: pointer;">›</button>
+        </h2>
+        <div class="before-toggle">
+          <button>List</button>
+          <button class="active">Calendar</button>
+        </div>
+      </div>
+
+      <div class="before-calendar">
+        <div class="before-day-headers">
+          <div class="before-day-header">SUN</div>
+          <div class="before-day-header">MON</div>
+          <div class="before-day-header">TUE</div>
+          <div class="before-day-header">WED</div>
+          <div class="before-day-header">THU</div>
+          <div class="before-day-header">FRI</div>
+          <div class="before-day-header">SAT</div>
+        </div>
+
+        <div class="before-body">
+          <!-- Week 1 -->
+          <div class="before-cell weekend other-month"><div class="before-date">28</div></div>
+          <div class="before-cell other-month"><div class="before-date">29</div></div>
+          <div class="before-cell other-month"><div class="before-date">30</div></div>
+          <div class="before-cell other-month"><div class="before-date">31</div></div>
+          <div class="before-cell"><div class="before-date">1</div></div>
+          <div class="before-cell"><div class="before-date">2</div></div>
+          <div class="before-cell weekend"><div class="before-date">3</div></div>
+
+          <!-- Week 2 -->
+          <div class="before-cell weekend"><div class="before-date">4</div></div>
+          <div class="before-cell"><div class="before-date">5</div></div>
+          <div class="before-cell"><div class="before-date">6</div></div>
+          <div class="before-cell"><div class="before-date">7</div></div>
+          <div class="before-cell"><div class="before-date">8</div></div>
+          <div class="before-cell"><div class="before-date">9</div></div>
+          <div class="before-cell weekend"><div class="before-date">10</div></div>
+
+          <!-- Week 3 -->
+          <div class="before-cell weekend"><div class="before-date">11</div></div>
+          <div class="before-cell"><div class="before-date">12</div></div>
+          <div class="before-cell"><div class="before-date">13</div></div>
+          <div class="before-cell"><div class="before-date">14</div></div>
+          <div class="before-cell"><div class="before-date">15</div></div>
+          <div class="before-cell"><div class="before-date">16</div></div>
+          <div class="before-cell weekend"><div class="before-date">17</div></div>
+
+          <!-- Week 4 -->
+          <div class="before-cell weekend"><div class="before-date">18</div></div>
+          <div class="before-cell">
+            <div class="before-date today">19</div>
+            <div class="before-event">
+              <div class="before-event-icons">
+                <span style="color: #0a66c2;">in</span>
+                <span style="color: #e4405f;">ig</span>
+              </div>
+              <div class="before-event-title">Waarom kiezen stee...</div>
+            </div>
+          </div>
+          <div class="before-cell"><div class="before-date">20</div></div>
+          <div class="before-cell"><div class="before-date">21</div></div>
+          <div class="before-cell"><div class="before-date">22</div></div>
+          <div class="before-cell"><div class="before-date">23</div></div>
+          <div class="before-cell weekend"><div class="before-date">24</div></div>
+
+          <!-- Week 5 -->
+          <div class="before-cell weekend"><div class="before-date">25</div></div>
+          <div class="before-cell"><div class="before-date">26</div></div>
+          <div class="before-cell"><div class="before-date">27</div></div>
+          <div class="before-cell"><div class="before-date">28</div></div>
+          <div class="before-cell"><div class="before-date">29</div></div>
+          <div class="before-cell"><div class="before-date">30</div></div>
+          <div class="before-cell weekend"><div class="before-date">31</div></div>
+
+          <!-- Week 6 -->
+          <div class="before-cell weekend other-month"><div class="before-date">1</div></div>
+          <div class="before-cell other-month"><div class="before-date">2</div></div>
+          <div class="before-cell other-month"><div class="before-date">3</div></div>
+          <div class="before-cell other-month"><div class="before-date">4</div></div>
+          <div class="before-cell other-month"><div class="before-date">5</div></div>
+          <div class="before-cell other-month"><div class="before-date">6</div></div>
+          <div class="before-cell weekend other-month"><div class="before-date">7</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Comparison Toggle -->
+  <div class="comparison-bar">
+    <span>Compare:</span>
+    <div class="comparison-toggle">
+      <button class="comparison-btn" onclick="showBefore()">Before</button>
+      <button class="comparison-btn active" onclick="showAfter()">After</button>
+    </div>
+  </div>
+
+  <script>
+    function showBefore() {
+      document.getElementById('beforeState').classList.add('visible');
+      document.getElementById('afterState').classList.add('hidden');
+      document.querySelectorAll('.comparison-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.comparison-btn')[0].classList.add('active');
+    }
+
+    function showAfter() {
+      document.getElementById('beforeState').classList.remove('visible');
+      document.getElementById('afterState').classList.remove('hidden');
+      document.querySelectorAll('.comparison-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.comparison-btn')[1].classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

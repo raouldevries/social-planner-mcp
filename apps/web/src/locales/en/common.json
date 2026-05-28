@@ -1,0 +1,72 @@
+{
+  "app": {
+    "name": "Social Planner",
+    "tagline": "Social Media Content Planning"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "posts": "Posts",
+    "articles": "Articles",
+    "calendar": "Calendar",
+    "media": "Media Library",
+    "accounts": "Social Accounts",
+    "users": "User Management",
+    "settings": "Settings"
+  },
+  "auth": {
+    "login": "Sign in",
+    "register": "Create account",
+    "logout": "Logout",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "fullName": "Full name",
+    "rememberMe": "Remember me",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signInWith": "Sign in with {{provider}}",
+    "orContinueWith": "Or continue with"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit"
+  },
+  "status": {
+    "draft": "Draft",
+    "pending": "Pending Approval",
+    "approved": "Approved",
+    "scheduled": "Scheduled",
+    "published": "Published",
+    "rejected": "Rejected",
+    "failed": "Failed"
+  },
+  "roles": {
+    "admin": "Admin",
+    "editor": "Editor",
+    "viewer": "Viewer"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "notFound": "The requested resource was not found."
+  },
+  "success": {
+    "saved": "Changes saved successfully",
+    "deleted": "Successfully deleted",
+    "created": "Successfully created"
+  }
+}

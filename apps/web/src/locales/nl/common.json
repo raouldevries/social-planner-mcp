@@ -1,0 +1,72 @@
+{
+  "app": {
+    "name": "Social Planner",
+    "tagline": "Social Media Content Planning"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "posts": "Berichten",
+    "articles": "Artikelen",
+    "calendar": "Kalender",
+    "media": "Mediabibliotheek",
+    "accounts": "Social Accounts",
+    "users": "Gebruikersbeheer",
+    "settings": "Instellingen"
+  },
+  "auth": {
+    "login": "Inloggen",
+    "register": "Account aanmaken",
+    "logout": "Uitloggen",
+    "forgotPassword": "Wachtwoord vergeten?",
+    "resetPassword": "Wachtwoord resetten",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "confirmPassword": "Bevestig wachtwoord",
+    "fullName": "Volledige naam",
+    "rememberMe": "Onthoud mij",
+    "noAccount": "Nog geen account?",
+    "hasAccount": "Heb je al een account?",
+    "signInWith": "Inloggen met {{provider}}",
+    "orContinueWith": "Of ga verder met"
+  },
+  "common": {
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "create": "Aanmaken",
+    "search": "Zoeken",
+    "filter": "Filteren",
+    "loading": "Laden...",
+    "noResults": "Geen resultaten gevonden",
+    "confirm": "Bevestigen",
+    "back": "Terug",
+    "next": "Volgende",
+    "submit": "Verzenden"
+  },
+  "status": {
+    "draft": "Concept",
+    "pending": "Wacht op goedkeuring",
+    "approved": "Goedgekeurd",
+    "scheduled": "Ingepland",
+    "published": "Gepubliceerd",
+    "rejected": "Afgewezen",
+    "failed": "Mislukt"
+  },
+  "roles": {
+    "admin": "Beheerder",
+    "editor": "Redacteur",
+    "viewer": "Lezer"
+  },
+  "errors": {
+    "generic": "Er is iets misgegaan. Probeer het opnieuw.",
+    "network": "Netwerkfout. Controleer je verbinding.",
+    "unauthorized": "Je bent niet gemachtigd om deze actie uit te voeren.",
+    "notFound": "De gevraagde bron is niet gevonden."
+  },
+  "success": {
+    "saved": "Wijzigingen opgeslagen",
+    "deleted": "Succesvol verwijderd",
+    "created": "Succesvol aangemaakt"
+  }
+}

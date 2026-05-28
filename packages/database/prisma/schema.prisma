@@ -1,0 +1,724 @@
+// Social Planner - Database Schema
+// Single workspace architecture - all users share the "Acme" workspace
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  ADMIN   // Can manage users, social accounts, approve/reject posts
+  EDITOR  // Can create/edit posts, articles, upload media
+  VIEWER  // Read-only access, can comment
+}
+
+enum PostStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  REJECTED
+  UNPUBLISHED
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum SocialPlatform {
+  INSTAGRAM
+  LINKEDIN
+}
+
+enum ChannelStatus {
+  PENDING
+  PUBLISHED
+  FAILED
+}
+
+enum SharePermission {
+  VIEW
+  VIEW_COMMENT
+}
+
+enum AmbassadorStatus {
+  PENDING
+  ACTIVE
+  DECLINED
+}
+
+enum NotificationType {
+  POST_SUBMITTED
+  POST_APPROVED
+  POST_REJECTED
+  POST_PUBLISHED
+  POST_FAILED
+  COMMENT_ADDED
+  MENTION
+  COLLABORATOR_ASSIGNED
+  EDIT_REQUESTED
+  REVIEW_REQUESTED
+  AMBASSADOR_CONTENT
+  FEEDBACK_SUBMITTED
+  FEEDBACK_REPLY
+}
+
+enum FeedbackStatus {
+  NEW
+  REVIEWED
+  RESOLVED
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+  MICROSOFT
+}
+
+enum MCPScope {
+  READ_POSTS       // View posts and drafts
+  CREATE_POSTS     // Create new drafts
+  SCHEDULE_POSTS   // Schedule posts for publishing
+  READ_CHANNELS    // View connected social accounts
+  READ_ANALYTICS   // View post analytics
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+// ============================================
+// CORE ENTITIES
+// ============================================
+
+model User {
+  id              String       @id @default(uuid())
+  email           String       @unique
+  passwordHash    String?      @map("password_hash")
+  fullName        String       @map("full_name")
+  avatarUrl       String?      @map("avatar_url")
+  timezone        String       @default("UTC")
+  emailVerifiedAt DateTime?    @map("email_verified_at")
+  authProvider    AuthProvider @default(LOCAL) @map("auth_provider")
+  authProviderId  String?      @map("auth_provider_id")
+  role            UserRole     @default(EDITOR)
+  createdAt       DateTime     @default(now()) @map("created_at")
+  lastLoginAt     DateTime?    @map("last_login_at")
+
+  // Relations
+  socialAccountsConnected SocialAccount[]
+  postsAuthored           Post[]
+  articlesAuthored        Article[]
+  mediaUploaded           MediaAsset[]
+  mediaFoldersCreated     MediaFolder[]
+  collaboratorAssignments CollaboratorAssignment[] @relation("AssignedTo")
+  assignmentsMade         CollaboratorAssignment[] @relation("AssignedBy")
+  comments                Comment[]
+  activityLogs            ActivityLog[]
+  shareLinksCreated       ShareLink[]
+  ambassadorMemberships   AmbassadorMembership[]
+  notifications           Notification[]
+  feedbacks               Feedback[]
+  feedbackReplies         FeedbackReply[]
+  sessions                Session[]
+  postVersionsCreated     PostVersion[]            @relation("PostVersionCreator")
+  calendarEvents          CalendarEvent[]
+  mcpClients              MCPClient[]
+  invitationsSent         Invitation[]             @relation("InvitedBy")
+  acceptedInvitation      Invitation?              @relation("AcceptedInvitation")
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  refreshToken String   @unique @map("refresh_token")
+  userAgent    String?  @map("user_agent")
+  ipAddress    String?  @map("ip_address")
+  createdAt    DateTime @default(now()) @map("created_at")
+  expiresAt    DateTime @map("expires_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// ============================================
+// SOCIAL ACCOUNTS
+// ============================================
+
+model SocialAccount {
+  id                String         @id @default(uuid())
+  platform          SocialPlatform
+  platformAccountId String         @map("platform_account_id")
+  accountName       String         @map("account_name")
+  accountType       String?        @map("account_type")
+  accessToken       String         @map("access_token")
+  refreshToken      String?        @map("refresh_token")
+  tokenExpiresAt    DateTime?      @map("token_expires_at")
+  profileImageUrl   String?        @map("profile_image_url")
+  connectedById     String         @map("connected_by")
+  connectedAt       DateTime       @default(now()) @map("connected_at")
+  lastSyncAt        DateTime?      @map("last_sync_at")
+
+  connectedBy User          @relation(fields: [connectedById], references: [id])
+  channels    PostChannel[]
+
+  @@unique([platform, platformAccountId])
+  @@map("social_accounts")
+}
+
+// ============================================
+// CONTENT: POSTS
+// ============================================
+
+model Post {
+  id                    String     @id @default(uuid())
+  authorId              String     @map("author_id")
+  status                PostStatus @default(DRAFT)
+  baseContent           String?    @map("base_content")
+  createdAt             DateTime   @default(now()) @map("created_at")
+  updatedAt             DateTime   @updatedAt @map("updated_at")
+  scheduledAt           DateTime?  @map("scheduled_at")
+  publishedAt           DateTime?  @map("published_at")
+  rejectionReason       String?    @map("rejection_reason")
+  isAmbassadorAvailable Boolean    @default(false) @map("is_ambassador_available")
+  articleId             String?    @map("article_id")
+  linkUrl               String?    @map("link_url")
+  linkPreview           Json?      @map("link_preview")
+
+  author           User                     @relation(fields: [authorId], references: [id])
+  article          Article?                 @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  channels         PostChannel[]
+  media            PostMedia[]
+  collaborators    CollaboratorAssignment[]
+  comments         Comment[]
+  activityLogs     ActivityLog[]
+  shareLinks       ShareLink[]
+  ambassadorShares AmbassadorShare[]
+  versions         PostVersion[]
+
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+model PostChannel {
+  id              String        @id @default(uuid())
+  postId          String        @map("post_id")
+  socialAccountId String        @map("social_account_id")
+  customContent   String?       @map("custom_content")
+  scheduledAt     DateTime?     @map("scheduled_at")
+  platformPostId  String?       @map("platform_post_id")
+  publishedAt     DateTime?     @map("published_at")
+  publishError    String?       @map("publish_error")
+  publishedUrl    String?       @map("published_url")
+  status          ChannelStatus @default(PENDING)
+
+  post          Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  socialAccount SocialAccount  @relation(fields: [socialAccountId], references: [id], onDelete: Cascade)
+  analytics     PostAnalytics?
+
+  @@unique([postId, socialAccountId])
+  @@index([postId])
+  @@index([status, scheduledAt])
+  @@map("post_channels")
+}
+
+model PostAnalytics {
+  id          String   @id @default(uuid())
+  channelId   String   @unique @map("channel_id")
+  impressions Int      @default(0)
+  reach       Int      @default(0)
+  engagements Int      @default(0)
+  likes       Int      @default(0)
+  comments    Int      @default(0)
+  shares      Int      @default(0)
+  saves       Int      @default(0)
+  clicks      Int      @default(0)
+  syncedAt    DateTime @map("synced_at")
+  rawData     Json?    @map("raw_data")
+
+  channel PostChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@map("post_analytics")
+}
+
+// ============================================
+// CONTENT: ARTICLES
+// ============================================
+
+model Article {
+  id              String        @id @default(uuid())
+  authorId        String        @map("author_id")
+  title           String
+  content         String?
+  status          ArticleStatus @default(DRAFT)
+  featuredImageId String?       @map("featured_image_id")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  publishedAt     DateTime?     @map("published_at")
+  plannedAt       DateTime?     @map("planned_at")
+
+  author        User        @relation(fields: [authorId], references: [id])
+  featuredImage MediaAsset? @relation(fields: [featuredImageId], references: [id], onDelete: SetNull)
+  posts         Post[]
+  activityLogs  ActivityLog[]
+
+  @@index([status])
+  @@index([authorId])
+  @@index([plannedAt])
+  @@map("articles")
+}
+
+// ============================================
+// MEDIA LIBRARY
+// ============================================
+
+model MediaAsset {
+  id            String   @id @default(uuid())
+  uploadedById  String   @map("uploaded_by")
+  fileName      String   @map("file_name")
+  fileType      String   @map("file_type")
+  fileSize      BigInt   @map("file_size")
+  storagePath   String   @map("storage_path")
+  thumbnailPath String?  @map("thumbnail_path")
+  width         Int?
+  height        Int?
+  duration      Int?
+  altText       String?  @map("alt_text")
+  metadata      Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at")
+  folderId      String?  @map("folder_id")
+
+  uploadedBy       User          @relation(fields: [uploadedById], references: [id])
+  folder           MediaFolder?  @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  postMedia        PostMedia[]
+  articlesFeatured Article[]
+  tags             MediaTag[]
+
+  @@index([createdAt])
+  @@map("media_assets")
+}
+
+model MediaFolder {
+  id          String   @id @default(uuid())
+  name        String
+  parentId    String?  @map("parent_id")
+  createdById String   @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  createdBy User          @relation(fields: [createdById], references: [id])
+  parent    MediaFolder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children  MediaFolder[] @relation("FolderHierarchy")
+  assets    MediaAsset[]
+
+  @@map("media_folders")
+}
+
+model MediaTag {
+  id   String @id @default(uuid())
+  name String @unique
+
+  assets MediaAsset[]
+
+  @@map("media_tags")
+}
+
+model PostMedia {
+  id           String  @id @default(uuid())
+  postId       String  @map("post_id")
+  mediaAssetId String  @map("media_asset_id")
+  position     Int     @default(0)
+  altText      String? @map("alt_text")
+
+  post       Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  mediaAsset MediaAsset @relation(fields: [mediaAssetId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, mediaAssetId])
+  @@index([postId])
+  @@map("post_media")
+}
+
+// ============================================
+// COLLABORATION
+// ============================================
+
+model CollaboratorAssignment {
+  id           String   @id @default(uuid())
+  postId       String   @map("post_id")
+  userId       String   @map("user_id")
+  assignedById String   @map("assigned_by")
+  assignedAt   DateTime @default(now()) @map("assigned_at")
+
+  post       Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user       User @relation("AssignedTo", fields: [userId], references: [id], onDelete: Cascade)
+  assignedBy User @relation("AssignedBy", fields: [assignedById], references: [id])
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+  @@map("collaborator_assignments")
+}
+
+model Comment {
+  id                  String   @id @default(uuid())
+  postId              String   @map("post_id")
+  authorId            String?  @map("author_id")
+  externalAuthorName  String?  @map("external_author_name")
+  externalAuthorEmail String?  @map("external_author_email")
+  parentId            String?  @map("parent_id")
+  content             String
+  isResolved          Boolean  @default(false) @map("is_resolved")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  post     Post             @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author   User?            @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  parent   Comment?         @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  Comment[]        @relation("CommentThread")
+  mentions CommentMention[]
+
+  @@index([postId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+model CommentMention {
+  id        String @id @default(uuid())
+  commentId String @map("comment_id")
+  userId    String @map("user_id")
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@map("comment_mentions")
+}
+
+// ============================================
+// ACTIVITY & NOTIFICATIONS
+// ============================================
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  postId    String?  @map("post_id")
+  articleId String?  @map("article_id")
+  actorId   String   @map("actor_id")
+  action    String
+  details   Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  article Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  actor   User     @relation(fields: [actorId], references: [id])
+
+  @@index([createdAt])
+  @@index([postId])
+  @@index([articleId])
+  @@map("activity_logs")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  title     String
+  body      String
+  data      Json             @default("{}")
+  readAt    DateTime?        @map("read_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+// ============================================
+// FEEDBACK
+// ============================================
+
+model Feedback {
+  id              String         @id @default(uuid())
+  userId          String         @map("user_id")
+  pageUrl         String         @map("page_url")
+  elementSelector String?        @map("element_selector")
+  elementLabel    String?        @map("element_label")
+  content         String
+  screenshotUrl   String?        @map("screenshot_url")
+  status          FeedbackStatus @default(NEW)
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies FeedbackReply[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("feedbacks")
+}
+
+model FeedbackReply {
+  id         String   @id @default(uuid())
+  feedbackId String   @map("feedback_id")
+  authorId   String   @map("author_id")
+  content    String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  feedback Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  author   User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([feedbackId])
+  @@index([authorId])
+  @@map("feedback_replies")
+}
+
+// ============================================
+// VERSION HISTORY
+// ============================================
+
+model PostVersion {
+  id          String   @id @default(uuid())
+  postId      String   @map("post_id")
+  version     Int      // Sequential version number per post
+  content     String?  // Snapshot of baseContent
+  createdById String   @map("created_by_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  post      Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdBy User @relation("PostVersionCreator", fields: [createdById], references: [id])
+
+  @@unique([postId, version])
+  @@index([postId])
+  @@index([createdAt])
+  @@map("post_versions")
+}
+
+// ============================================
+// SHARE LINKS
+// ============================================
+
+model ShareLink {
+  id            String          @id @default(uuid())
+  postId        String?         @map("post_id")
+  calendarShare Boolean         @default(false) @map("calendar_share")
+  token         String          @unique
+  passwordHash  String?         @map("password_hash")
+  expiresAt     DateTime        @map("expires_at")
+  permissions   SharePermission @default(VIEW)
+  createdById   String          @map("created_by")
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  post      Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdBy User  @relation(fields: [createdById], references: [id])
+
+  @@index([token])
+  @@index([expiresAt])
+  @@map("share_links")
+}
+
+// ============================================
+// AMBASSADOR SYSTEM
+// ============================================
+
+model AmbassadorGroup {
+  id            String   @id @default(uuid())
+  name          String
+  description   String?
+  emailTemplate String?  @map("email_template") @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  members AmbassadorMembership[]
+
+  @@map("ambassador_groups")
+}
+
+model AmbassadorMembership {
+  id          String           @id @default(uuid())
+  groupId     String           @map("group_id")
+  userId      String?          @map("user_id")
+  email       String?
+  status      AmbassadorStatus @default(PENDING)
+  invitedAt   DateTime         @default(now()) @map("invited_at")
+  respondedAt DateTime?        @map("responded_at")
+
+  group  AmbassadorGroup   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user   User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shares AmbassadorShare[]
+
+  @@index([groupId])
+  @@index([userId])
+  @@map("ambassador_memberships")
+}
+
+model AmbassadorShare {
+  id           String         @id @default(uuid())
+  postId       String         @map("post_id")
+  ambassadorId String         @map("ambassador_id")
+  platform     SocialPlatform
+  sharedAt     DateTime       @default(now()) @map("shared_at")
+  shareUrl     String?        @map("share_url")
+
+  post       Post                 @relation(fields: [postId], references: [id], onDelete: Cascade)
+  ambassador AmbassadorMembership @relation(fields: [ambassadorId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([ambassadorId])
+  @@map("ambassador_shares")
+}
+
+// ============================================
+// CALENDAR EVENTS
+// ============================================
+
+model CalendarEvent {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  startAt     DateTime  @map("start_at")
+  endAt       DateTime? @map("end_at")
+  allDay      Boolean   @default(false) @map("all_day")
+  color       String    @default("#0EA5E9")
+  createdById String    @map("created_by_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([startAt])
+  @@index([createdById])
+  @@map("calendar_events")
+}
+
+// ============================================
+// MCP (Model Context Protocol) INTEGRATION
+// ============================================
+
+model MCPClient {
+  id            String     @id @default(uuid())
+  name          String     // e.g., "Claude Desktop - John's MacBook"
+  clientId      String     @unique @map("client_id") // Random identifier
+  clientSecret  String     @map("client_secret") // Hashed secret
+  userId        String     @map("user_id")
+  scopes        MCPScope[]
+  redirectUris  String[]   @map("redirect_uris")
+  isActive      Boolean    @default(true) @map("is_active")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  lastUsedAt    DateTime?  @map("last_used_at")
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions  MCPSession[]
+  auditLogs MCPAuditLog[]
+
+  @@index([userId])
+  @@index([clientId])
+  @@map("mcp_clients")
+}
+
+model MCPSession {
+  id               String     @id @default(uuid())
+  clientId         String     @map("client_id")
+  accessToken      String     @unique @map("access_token")
+  refreshToken     String     @unique @map("refresh_token")
+  scopes           MCPScope[]
+  expiresAt        DateTime   @map("expires_at")
+  refreshExpiresAt DateTime   @map("refresh_expires_at")
+  createdAt        DateTime   @default(now()) @map("created_at")
+  revokedAt        DateTime?  @map("revoked_at")
+
+  client MCPClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([accessToken])
+  @@index([expiresAt])
+  @@map("mcp_sessions")
+}
+
+model MCPAuditLog {
+  id          String   @id @default(uuid())
+  clientId    String   @map("client_id")
+  userId      String   @map("user_id")
+  tool        String   // Tool name: create_post, schedule_post, etc.
+  action      String   // Action taken
+  inputParams Json     @map("input_params")
+  result      Json     @default("{}")
+  success     Boolean
+  errorCode   String?  @map("error_code")
+  durationMs  Int      @map("duration_ms")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  client MCPClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([tool])
+  @@map("mcp_audit_logs")
+}
+
+// Pending confirmation for MCP actions requiring user approval
+model MCPPendingAction {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  clientId    String    @map("client_id")
+  actionType  String    @map("action_type") // schedule_post, publish_now, etc.
+  payload     Json      // Full action payload
+  description String    // Human-readable description
+  status      String    @default("PENDING") // PENDING, APPROVED, REJECTED, EXPIRED
+  expiresAt   DateTime  @map("expires_at")
+  resolvedAt  DateTime? @map("resolved_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([userId, status])
+  @@index([expiresAt])
+  @@map("mcp_pending_actions")
+}
+
+// ============================================
+// INVITATION SYSTEM (Invite-Only Registration)
+// ============================================
+
+model Invitation {
+  id           String           @id @default(uuid())
+  email        String           // Normalized: lowercase, trimmed
+  tokenHash    String           @unique @map("token_hash") // SHA-256 hash of token (never store raw)
+  role         UserRole         @default(EDITOR)
+  invitedById  String           @map("invited_by_id")
+  acceptedById String?          @unique @map("accepted_by_id") // User who accepted (audit trail)
+  status       InvitationStatus @default(PENDING)
+  expiresAt    DateTime         @map("expires_at")
+  acceptedAt   DateTime?        @map("accepted_at")
+  revokedAt    DateTime?        @map("revoked_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  invitedBy  User  @relation("InvitedBy", fields: [invitedById], references: [id])
+  acceptedBy User? @relation("AcceptedInvitation", fields: [acceptedById], references: [id])
+
+  @@index([email])
+  @@index([tokenHash])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("invitations")
+}

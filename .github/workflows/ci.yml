@@ -1,0 +1,235 @@
+# ============================================
+# Social Planner - CI Workflow
+# Runs on pull requests and pushes to main
+# ============================================
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ==========================================
+  # Lint and Type Check
+  # ==========================================
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate --schema=packages/database/prisma/schema.prisma
+
+      - name: Clean TypeScript build cache
+        run: find . -name "tsconfig.tsbuildinfo" -delete
+
+      - name: Run ESLint
+        run: npx turbo lint --force
+
+      - name: Type check
+        run: npx turbo build --force
+
+  # ==========================================
+  # Run Tests
+  # ==========================================
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: planner
+          POSTGRES_PASSWORD: planner_test
+          POSTGRES_DB: planner_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://planner:planner_test@localhost:5432/planner_test
+      REDIS_URL: redis://localhost:6379
+      JWT_ACCESS_SECRET: test-access-secret
+      JWT_REFRESH_SECRET: test-refresh-secret
+      NODE_ENV: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate --schema=packages/database/prisma/schema.prisma
+
+      - name: Clean TypeScript build cache
+        run: find . -name "tsconfig.tsbuildinfo" -delete
+
+      - name: Build packages
+        run: npx turbo build --force
+
+      - name: Push database schema
+        run: npx prisma db push --schema=packages/database/prisma/schema.prisma --accept-data-loss
+
+      - name: Run unit tests
+        run: npm run test
+
+  # ==========================================
+  # Build Docker Images
+  # ==========================================
+  build:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.api
+          push: false
+          tags: planner-api:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Web image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.web
+          push: false
+          tags: planner-web:${{ github.sha }}
+          build-args: |
+            VITE_API_URL=https://api.example.com
+            VITE_APP_URL=https://example.com
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ==========================================
+  # E2E Tests (Optional - runs on main only)
+  # ==========================================
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    continue-on-error: true # Optional until server startup is configured
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: planner
+          POSTGRES_PASSWORD: planner_test
+          POSTGRES_DB: planner_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://planner:planner_test@localhost:5432/planner_test
+      REDIS_URL: redis://localhost:6379
+      JWT_ACCESS_SECRET: test-access-secret
+      JWT_REFRESH_SECRET: test-refresh-secret
+      NODE_ENV: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Generate Prisma Client
+        run: npx prisma generate --schema=packages/database/prisma/schema.prisma
+
+      - name: Clean TypeScript build cache
+        run: find . -name "tsconfig.tsbuildinfo" -delete
+
+      - name: Build packages
+        run: npx turbo build --force
+
+      - name: Push database schema
+        run: npx prisma db push --schema=packages/database/prisma/schema.prisma --accept-data-loss
+
+      - name: Seed database
+        run: cd packages/database && npx ts-node --transpile-only prisma/seed.ts
+
+      - name: Run E2E tests
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

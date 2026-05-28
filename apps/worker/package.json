@@ -1,0 +1,12 @@
+{
+  "name": "@social-planner/worker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Worker not yet implemented'",
+    "build": "echo 'Worker build not yet implemented'",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "test": "echo 'No tests yet'"
+  }
+}

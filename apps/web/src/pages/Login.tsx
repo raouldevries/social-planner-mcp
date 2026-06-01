@@ -412,7 +412,7 @@ export function Login() {
                     transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                     className="w-full h-12 rounded-lg font-medium border border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    👀 Explore the demo (read-only)
+                    Explore the demo (read-only)
                   </motion.button>
                   <p className="mt-2 text-center text-xs text-gray-500">
                     Browse with sample data — no sign-up, and nothing you do is saved.

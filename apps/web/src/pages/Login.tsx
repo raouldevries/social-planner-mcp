@@ -20,6 +20,14 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+// Public read-only demo account (seeded as demo@planner.com). The credentials are
+// intentionally public — the API rejects every write from this account. They are
+// overridable per-deployment, and the button can be hidden with
+// VITE_DEMO_LOGIN_ENABLED=false.
+const DEMO_EMAIL = import.meta.env.VITE_DEMO_EMAIL || 'demo@planner.com';
+const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD || 'demo';
+const DEMO_LOGIN_ENABLED = import.meta.env.VITE_DEMO_LOGIN_ENABLED !== 'false';
+
 // OAuth URLs - these will redirect to the API
 // TODO: Re-enable when OAuth is configured
 // const GOOGLE_AUTH_URL = '/api/auth/google';
@@ -71,6 +79,10 @@ export function Login() {
 
   const onSubmit = (data: LoginFormData) => {
     loginMutation.mutate(data);
+  };
+
+  const handleDemoLogin = () => {
+    loginMutation.mutate({ email: DEMO_EMAIL, password: DEMO_PASSWORD });
   };
 
   // Blur reveal variants for staggered children
@@ -374,6 +386,39 @@ export function Login() {
                   </motion.div>
                 </motion.form>
               </motion.div>
+
+              {/* Demo login — read-only exploration */}
+              {DEMO_LOGIN_ENABLED && (
+                <motion.div
+                  initial={{ opacity: 0, filter: 'blur(8px)' }}
+                  animate={{ opacity: 1, filter: 'blur(0px)' }}
+                  transition={{ delay: 1.1, duration: 0.4 }}
+                  className="mt-6"
+                >
+                  <div className="relative mb-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200" />
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="bg-white/80 px-4 text-gray-500">or</span>
+                    </div>
+                  </div>
+                  <motion.button
+                    type="button"
+                    onClick={handleDemoLogin}
+                    disabled={isLoading || showSuccess}
+                    whileHover={{ scale: isLoading || showSuccess ? 1 : 1.02 }}
+                    whileTap={{ scale: isLoading || showSuccess ? 1 : 0.98 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                    className="w-full h-12 rounded-lg font-medium border border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    👀 Explore the demo (read-only)
+                  </motion.button>
+                  <p className="mt-2 text-center text-xs text-gray-500">
+                    Browse with sample data — no sign-up, and nothing you do is saved.
+                  </p>
+                </motion.div>
+              )}
 
               {/* Success Message */}
               <AnimatePresence>

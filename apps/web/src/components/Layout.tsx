@@ -7,7 +7,7 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { motion, AnimatePresence } from 'motion/react';
-import { useUser, useCanEdit, useIsAdmin } from '@/stores/authStore';
+import { useUser, useCanEdit, useIsAdmin, useIsDemo } from '@/stores/authStore';
 import { useSidebar, useSidebarAutoClose } from '@/stores/uiStore';
 import { useLogout } from '@/hooks/useAuth';
 import { PendingActionsIndicator } from '@/components/mcp';
@@ -283,6 +283,7 @@ export function Layout() {
   const user = useUser();
   const canEdit = useCanEdit();
   const isAdmin = useIsAdmin();
+  const isDemo = useIsDemo();
   const logoutMutation = useLogout();
   const { isOpen: isSidebarOpen, toggle: toggleSidebar, close: closeSidebar } = useSidebar();
 
@@ -438,6 +439,20 @@ export function Layout() {
               </button>
             </div>
           </header>
+
+          {/* Read-only demo banner */}
+          {isDemo && (
+            <div
+              role="status"
+              className="flex items-center justify-center gap-2 bg-amber-50 border-b border-amber-200 px-4 py-2 text-center text-sm text-amber-800 safe-area-x"
+            >
+              <span aria-hidden="true">👀</span>
+              <span>
+                <span className="font-medium">Demo mode — read-only.</span> You can explore
+                everything, but changes are disabled.
+              </span>
+            </div>
+          )}
 
           {/* Page content */}
           <main className="py-4 lg:py-6 safe-area-x">

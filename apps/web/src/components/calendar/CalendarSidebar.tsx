@@ -12,6 +12,7 @@
 
 import { useState, useCallback } from 'react';
 import { POST_STATUS, SOCIAL_PLATFORM } from '@social-planner/shared';
+import { useCanEdit } from '@/stores/authStore';
 
 interface CalendarSidebarProps {
   selectedStatuses: string[];
@@ -102,6 +103,7 @@ export function CalendarSidebar({
   showArticles,
   onArticlesToggle,
 }: CalendarSidebarProps) {
+  const canEdit = useCanEdit();
   const [statusExpanded, setStatusExpanded] = useState(true);
   const [platformExpanded, setPlatformExpanded] = useState(true);
 
@@ -302,11 +304,12 @@ export function CalendarSidebar({
         </div>
       </div>
 
-      {/* Action footer - three buttons */}
-      <div className="p-4 border-t border-neutral-100 space-y-2">
-        <button
-          onClick={onNewPost}
-          className="
+      {/* Action footer - three buttons (hidden for read-only / viewer accounts) */}
+      {canEdit && (
+        <div className="p-4 border-t border-neutral-100 space-y-2">
+          <button
+            onClick={onNewPost}
+            className="
             flex items-center justify-center gap-2 w-full
             px-4 py-2.5 rounded-lg
             bg-primary-600 text-white text-sm font-medium
@@ -314,13 +317,13 @@ export function CalendarSidebar({
             hover:bg-primary-700 active:bg-primary-800
             transition-all duration-200 ease-out
           "
-        >
-          <PlusIcon />
-          <span>New Post</span>
-        </button>
-        <button
-          onClick={onNewArticle}
-          className="
+          >
+            <PlusIcon />
+            <span>New Post</span>
+          </button>
+          <button
+            onClick={onNewArticle}
+            className="
             flex items-center justify-center gap-2 w-full
             px-4 py-2 rounded-lg
             border border-neutral-200 text-neutral-700 text-sm font-medium
@@ -328,13 +331,13 @@ export function CalendarSidebar({
             active:bg-neutral-100
             transition-all duration-200 ease-out
           "
-        >
-          <ArticleIcon />
-          <span>New Article</span>
-        </button>
-        <button
-          onClick={onNewEvent}
-          className="
+          >
+            <ArticleIcon />
+            <span>New Article</span>
+          </button>
+          <button
+            onClick={onNewEvent}
+            className="
             flex items-center justify-center gap-2 w-full
             px-4 py-2 rounded-lg
             border border-neutral-200 text-neutral-700 text-sm font-medium
@@ -342,11 +345,12 @@ export function CalendarSidebar({
             active:bg-neutral-100
             transition-all duration-200 ease-out
           "
-        >
-          <EventIcon />
-          <span>New Event</span>
-        </button>
-      </div>
+          >
+            <EventIcon />
+            <span>New Event</span>
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

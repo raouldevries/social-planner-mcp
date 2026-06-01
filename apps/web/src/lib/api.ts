@@ -5,6 +5,7 @@
  */
 
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/authStore';
 
 // API base URL - uses Vite proxy in development
@@ -86,6 +87,14 @@ api.interceptors.response.use(
         window.location.href = '/login';
         return Promise.reject(error);
       }
+    }
+
+    // Read-only demo account attempted a write — surface a friendly message.
+    if (
+      error.response?.status === 403 &&
+      (error.response.data as { code?: string } | undefined)?.code === 'DEMO_READ_ONLY'
+    ) {
+      toast.error('This is a read-only demo — changes are disabled.');
     }
 
     return Promise.reject(error);

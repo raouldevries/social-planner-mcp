@@ -16,6 +16,8 @@ export interface User {
   avatarUrl: string | null;
   timezone: string;
   role: UserRole;
+  /** True only for the public read-only demo account; the API rejects all writes from it. */
+  isDemo?: boolean;
 }
 
 interface AuthState {
@@ -68,3 +70,4 @@ export const useIsAuthenticated = () => useAuthStore((state) => state.isAuthenti
 export const useIsAdmin = () => useAuthStore((state) => state.user?.role === 'ADMIN');
 export const useCanEdit = () =>
   useAuthStore((state) => state.user?.role === 'ADMIN' || state.user?.role === 'EDITOR');
+export const useIsDemo = () => useAuthStore((state) => state.user?.isDemo === true);

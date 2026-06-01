@@ -30,6 +30,7 @@ import {
 } from '@/hooks/useCalendar';
 import { useCalendarEvents, useRescheduleCalendarEvent } from '@/hooks/useCalendarEvents';
 import { useMCPPendingActions } from '@/hooks/useMCP';
+import { useCanEdit } from '@/stores/authStore';
 import { CalendarSidebar, renderCalendarPostCard } from '@/components/calendar';
 import { CalendarEventModal } from '@/components/calendar/CalendarEventModal';
 import { ShareLinkModal } from '@/components/share/ShareLinkModal';
@@ -424,14 +425,17 @@ export function Calendar() {
     [reschedulePost, rescheduleCalendarEvent, rescheduleArticle]
   );
 
+  const canEdit = useCanEdit();
+
   const handleDateSelect = useCallback(
     (arg: DateSelectArg) => {
+      if (!canEdit) return;
       const date = format(arg.start, "yyyy-MM-dd'T'HH:mm");
       navigate(`/posts/new?scheduledAt=${encodeURIComponent(date)}`, {
         state: { from: 'calendar' },
       });
     },
-    [navigate]
+    [navigate, canEdit]
   );
 
   const handleNewPost = useCallback(() => {
@@ -752,8 +756,8 @@ export function Calendar() {
               headerToolbar={false}
               events={events}
               eventContent={renderCalendarPostCard}
-              editable={true}
-              selectable={true}
+              editable={canEdit}
+              selectable={canEdit}
               selectMirror={true}
               dayMaxEvents={isMobile ? 2 : 3}
               weekends={true}

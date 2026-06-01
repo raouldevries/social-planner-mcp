@@ -31,7 +31,7 @@ vi.mock('../lib/prisma', () => ({
   },
 }));
 
-import { blockDemoWrites, requireAuth, generateAccessToken } from './auth';
+import { blockDemoWrites, requireAuth, requireEditor, generateAccessToken } from './auth';
 import { prisma } from '../lib/prisma';
 
 // ---------------------------------------------------------------------------
@@ -130,6 +130,10 @@ function buildApp() {
   app.post('/api/auth/logout', requireAuth, (_req, res) => {
     res.status(204).send();
   });
+  // Editor-only route — mirrors the guard the hardened content routes now use.
+  app.post('/api/editor-only', requireAuth, requireEditor, (_req, res) => {
+    res.json({ ok: true });
+  });
   return app;
 }
 
@@ -195,5 +199,38 @@ describe('requireAuth (demo guard integration)', () => {
   it('rejects an unauthenticated request with 401', async () => {
     const res = await request(buildApp()).post('/api/posts').send({});
     expect(res.status).toBe(401);
+  });
+});
+
+describe('requireEditor (role guard integration)', () => {
+  const viewerRecord = { ...editorRecord, id: 'viewer-2', role: 'VIEWER', isDemo: false };
+  const adminRecord = { ...editorRecord, id: 'admin-2', role: 'ADMIN' };
+
+  it('rejects a VIEWER from an editor-only route with 403 INSUFFICIENT_PERMISSIONS', async () => {
+    vi.mocked(prisma.user.findUnique).mockResolvedValue(viewerRecord as never);
+    const token = generateAccessToken(viewerRecord.id);
+
+    const res = await request(buildApp())
+      .post('/api/editor-only')
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe('INSUFFICIENT_PERMISSIONS');
+  });
+
+  it.each([
+    ['EDITOR', editorRecord],
+    ['ADMIN', adminRecord],
+  ])('allows an %s on an editor-only route', async (_role, record) => {
+    vi.mocked(prisma.user.findUnique).mockResolvedValue(record as never);
+    const token = generateAccessToken(record.id);
+
+    const res = await request(buildApp())
+      .post('/api/editor-only')
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+
+    expect(res.status).toBe(200);
   });
 });

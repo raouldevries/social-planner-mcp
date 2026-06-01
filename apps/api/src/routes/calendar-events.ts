@@ -7,7 +7,7 @@
 
 import { Router } from 'express';
 import { validate, validateQuery } from '../middleware/validate';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, requireEditor } from '../middleware/auth';
 import { writeRateLimiter } from '../middleware/rateLimiter';
 import {
   createCalendarEventSchema,
@@ -59,6 +59,7 @@ router.get('/:id', requireAuth, async (req, res, next) => {
 router.post(
   '/',
   requireAuth,
+  requireEditor,
   writeRateLimiter,
   validate(createCalendarEventSchema),
   async (req, res, next) => {
@@ -78,6 +79,7 @@ router.post(
 router.patch(
   '/:id',
   requireAuth,
+  requireEditor,
   writeRateLimiter,
   validate(updateCalendarEventSchema),
   async (req, res, next) => {
@@ -97,6 +99,7 @@ router.patch(
 router.patch(
   '/:id/reschedule',
   requireAuth,
+  requireEditor,
   writeRateLimiter,
   validate(rescheduleCalendarEventSchema),
   async (req, res, next) => {
@@ -117,7 +120,7 @@ router.patch(
  * DELETE /api/calendar-events/:id
  * Delete a calendar event
  */
-router.delete('/:id', requireAuth, writeRateLimiter, async (req, res, next) => {
+router.delete('/:id', requireAuth, requireEditor, writeRateLimiter, async (req, res, next) => {
   try {
     await calendarEventService.deleteCalendarEvent(req.params.id);
     res.status(204).send();

@@ -5,7 +5,7 @@
  */
 
 import { Router } from 'express';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, requireEditor } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
 import { AppError } from '../middleware/errorHandler';
 import * as postService from '../services/post.service';
@@ -99,7 +99,7 @@ router.get('/:id', requireAuth, async (req, res, next) => {
  * Approve a pending action
  * POST /api/mcp/pending-actions/:id/approve
  */
-router.post('/:id/approve', requireAuth, async (req, res, next) => {
+router.post('/:id/approve', requireAuth, requireEditor, async (req, res, next) => {
   try {
     const action = await prisma.mCPPendingAction.findFirst({
       where: {
@@ -198,7 +198,7 @@ router.post('/:id/approve', requireAuth, async (req, res, next) => {
  * Reject a pending action
  * POST /api/mcp/pending-actions/:id/reject
  */
-router.post('/:id/reject', requireAuth, async (req, res, next) => {
+router.post('/:id/reject', requireAuth, requireEditor, async (req, res, next) => {
   try {
     const action = await prisma.mCPPendingAction.findFirst({
       where: {

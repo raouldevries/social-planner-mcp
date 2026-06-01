@@ -129,14 +129,24 @@ router.get('/share-links', requireAuth, async (req, res, next) => {
  * DELETE /api/share-links/:id
  * Delete a share link (owner or admin)
  */
-router.delete('/share-links/:id', requireAuth, writeRateLimiter, async (req, res, next) => {
-  try {
-    await shareLinkService.deleteShareLink(req.params.id, req.user!.id, req.user!.role === 'ADMIN');
-    res.status(204).send();
-  } catch (error) {
-    next(error);
+router.delete(
+  '/share-links/:id',
+  requireAuth,
+  requireEditor,
+  writeRateLimiter,
+  async (req, res, next) => {
+    try {
+      await shareLinkService.deleteShareLink(
+        req.params.id,
+        req.user!.id,
+        req.user!.role === 'ADMIN'
+      );
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 // ============================================
 // PUBLIC ROUTES (Access shared content)

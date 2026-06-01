@@ -5,7 +5,7 @@
  */
 
 import { Router } from 'express';
-import { requireAuth } from '../middleware/auth';
+import { requireAuth, requireEditor } from '../middleware/auth';
 import { writeRateLimiter } from '../middleware/rateLimiter';
 import * as versionService from '../services/version.service';
 
@@ -49,14 +49,20 @@ router.get('/versions/:id', requireAuth, async (req, res, next) => {
  * POST /api/versions/:id/restore
  * Restore a previous version
  */
-router.post('/versions/:id/restore', requireAuth, writeRateLimiter, async (req, res, next) => {
-  try {
-    const userId = req.user!.id;
-    const result = await versionService.restoreVersion(req.params.id, userId);
-    res.json(result);
-  } catch (error) {
-    next(error);
+router.post(
+  '/versions/:id/restore',
+  requireAuth,
+  requireEditor,
+  writeRateLimiter,
+  async (req, res, next) => {
+    try {
+      const userId = req.user!.id;
+      const result = await versionService.restoreVersion(req.params.id, userId);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 export default router;

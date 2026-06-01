@@ -18,6 +18,13 @@ export const MCP_SCOPES = [
 
 export type MCPScope = (typeof MCP_SCOPES)[number];
 
+/**
+ * Scopes that allow mutating data. The read-only demo account never receives
+ * these — they are stripped before MCP tools are registered (see mcp.ts), so a
+ * demo user can never invoke a write tool even over the MCP transport.
+ */
+export const MCP_WRITE_SCOPES = ['create_posts', 'schedule_posts'] as const;
+
 // ============================================
 // OAUTH FLOW TYPES
 // ============================================

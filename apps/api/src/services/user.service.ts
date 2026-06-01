@@ -20,6 +20,7 @@ export interface UserProfile {
   avatarUrl: string | null;
   timezone: string;
   role: UserRole;
+  isDemo: boolean;
   authProvider: AuthProvider;
   emailVerifiedAt: string | null;
   createdAt: string;
@@ -58,6 +59,7 @@ function formatUserProfile(user: {
   avatarUrl: string | null;
   timezone: string;
   role: UserRole;
+  isDemo?: boolean;
   authProvider: AuthProvider;
   emailVerifiedAt: Date | null;
   createdAt: Date;
@@ -70,6 +72,7 @@ function formatUserProfile(user: {
     avatarUrl: user.avatarUrl,
     timezone: user.timezone,
     role: user.role,
+    isDemo: user.isDemo ?? false,
     authProvider: user.authProvider,
     emailVerifiedAt: user.emailVerifiedAt?.toISOString() ?? null,
     createdAt: user.createdAt.toISOString(),
@@ -116,6 +119,7 @@ export async function getProfile(userId: string): Promise<UserProfile> {
       avatarUrl: true,
       timezone: true,
       role: true,
+      isDemo: true,
       authProvider: true,
       emailVerifiedAt: true,
       createdAt: true,

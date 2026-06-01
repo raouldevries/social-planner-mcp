@@ -7,7 +7,17 @@
 
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
-import type { MCPScope, MCPToolResult } from '@social-planner/shared';
+import { MCP_WRITE_SCOPES, type MCPScope, type MCPToolResult } from '@social-planner/shared';
+
+/**
+ * Remove write scopes from a scope list. Used to enforce read-only access for
+ * the demo account on the MCP transport: with write scopes stripped, no write
+ * tool's requiredScopes can be satisfied, so write tools are never registered.
+ */
+export function filterReadOnlyScopes(scopes: MCPScope[]): MCPScope[] {
+  const writeScopes = MCP_WRITE_SCOPES as readonly string[];
+  return scopes.filter((scope) => !writeScopes.includes(scope));
+}
 
 // Tool definitions with Zod schemas
 export const MCP_TOOLS = {
@@ -129,6 +139,8 @@ export interface ToolContext {
   userId: string;
   userRole: 'ADMIN' | 'EDITOR' | 'VIEWER';
   clientId: string;
+  /** True for the read-only demo account; write tools are not registered for it. */
+  isDemo?: boolean;
 }
 
 // Helper: Check if user can modify a post

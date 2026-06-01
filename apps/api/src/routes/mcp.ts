@@ -10,8 +10,14 @@ import { randomUUID } from 'node:crypto';
 import { loadMcpSdk } from '../lib/mcp-sdk.js';
 
 import { requireMCPAuth } from '../middleware/mcp-auth.js';
-import { MCP_TOOLS, getHandler, type ToolContext } from '../services/mcp-tools.service.js';
+import {
+  MCP_TOOLS,
+  getHandler,
+  filterReadOnlyScopes,
+  type ToolContext,
+} from '../services/mcp-tools.service.js';
 import { logToolInvocation } from '../services/mcp-audit.service.js';
+import { prisma } from '../lib/prisma.js';
 
 const router = Router();
 
@@ -46,18 +52,31 @@ async function createMcpServer(mcpContext: NonNullable<Request['mcpContext']>): 
     version: '1.0.0',
   });
 
+  // Read-only demo accounts must not mutate data over the MCP transport either.
+  // This path uses requireMCPAuth (not requireAuth), so the blockDemoWrites guard
+  // does not apply here — instead we strip write scopes so write tools are never
+  // registered for a demo user. isDemo is read fresh from the DB (authoritative),
+  // mirroring how the JWT strategy resolves it.
+  const dbUser = await prisma.user.findUnique({
+    where: { id: mcpContext.userId },
+    select: { isDemo: true },
+  });
+  const isDemo = dbUser?.isDemo ?? false;
+  const effectiveScopes = isDemo ? filterReadOnlyScopes(mcpContext.scopes) : mcpContext.scopes;
+
   // Build tool context from MCP auth context
   const toolContext: ToolContext = {
     userId: mcpContext.userId,
     userRole: mcpContext.user.role as 'ADMIN' | 'EDITOR' | 'VIEWER',
     clientId: mcpContext.clientId,
+    isDemo,
   };
 
   // Register all tools
   for (const [toolName, toolDef] of Object.entries(MCP_TOOLS)) {
-    // Check if user has required scopes
+    // Check if user has required scopes (write scopes already stripped for demo users)
     const hasRequiredScopes = toolDef.requiredScopes.every((scope) =>
-      mcpContext.scopes.includes(scope)
+      effectiveScopes.includes(scope)
     );
 
     if (!hasRequiredScopes) {

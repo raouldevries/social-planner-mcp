@@ -95,6 +95,8 @@ export interface UserSummary {
   avatarUrl: string | null;
   timezone: string;
   role: UserRole;
+  /** True only for the public read-only demo account; the API rejects all writes from it. */
+  isDemo?: boolean;
 }
 
 export interface UserDetail extends UserSummary {

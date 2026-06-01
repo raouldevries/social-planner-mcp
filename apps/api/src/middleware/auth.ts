@@ -24,6 +24,7 @@ declare global {
       avatarUrl: string | null;
       timezone: string;
       role: UserRole;
+      isDemo: boolean;
     }
   }
 }
@@ -49,6 +50,7 @@ passport.use(
             avatarUrl: true,
             timezone: true,
             role: true,
+            isDemo: true,
           },
         });
 
@@ -64,8 +66,48 @@ passport.use(
   )
 );
 
-// Authentication middleware
-export const requireAuth = passport.authenticate('jwt', { session: false });
+// HTTP methods that never mutate state — always allowed, even for demo users.
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+// Write endpoints a demo user is still allowed to call (so they can sign out).
+const DEMO_WRITE_ALLOWLIST = new Set(['/api/auth/logout', '/api/auth/logout-all']);
+
+/**
+ * Read-only demo guard.
+ *
+ * Demo accounts (User.isDemo) get read-only access. This rejects every
+ * state-changing request from a demo user, regardless of role or which route it
+ * targets. It is a single choke point: because it is folded into requireAuth
+ * (below), a forgotten per-route write guard can never accidentally expose a
+ * mutation to the public demo account.
+ *
+ * Runs after authentication, so req.user is populated.
+ */
+export const blockDemoWrites = (req: Request, res: Response, next: NextFunction): void => {
+  if (req.user?.isDemo && !SAFE_METHODS.has(req.method)) {
+    const path = req.originalUrl.split('?')[0];
+    if (!DEMO_WRITE_ALLOWLIST.has(path)) {
+      res.status(403).json({
+        code: 'DEMO_READ_ONLY',
+        message: 'This is a read-only demo account. Sign up for your own account to make changes.',
+      });
+      return;
+    }
+  }
+  next();
+};
+
+// Authentication middleware.
+// Authenticates the JWT, then enforces the read-only demo guard. Since every
+// protected route uses requireAuth, the demo guard automatically covers them all.
+const authenticateJwt = passport.authenticate('jwt', { session: false });
+
+export const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
+  authenticateJwt(req, res, (err?: unknown) => {
+    if (err) return next(err);
+    blockDemoWrites(req, res, next);
+  });
+};
 
 // Role-based access control middleware
 // Single workspace: uses user.role directly instead of membership

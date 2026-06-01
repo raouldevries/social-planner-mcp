@@ -28,6 +28,7 @@ export interface AuthResult {
     avatarUrl: string | null;
     timezone: string;
     role: UserRole;
+    isDemo?: boolean;
   };
 }
 
@@ -99,6 +100,7 @@ export async function loginUser(
       avatarUrl: true,
       timezone: true,
       role: true,
+      isDemo: true,
       passwordHash: true,
       authProvider: true,
     },
@@ -175,6 +177,7 @@ export async function refreshTokens(refreshToken: string): Promise<AuthResult> {
       avatarUrl: true,
       timezone: true,
       role: true,
+      isDemo: true,
     },
   });
 
@@ -334,6 +337,7 @@ export async function getUserById(userId: string) {
       avatarUrl: true,
       timezone: true,
       role: true,
+      isDemo: true,
       authProvider: true,
       emailVerifiedAt: true,
       createdAt: true,

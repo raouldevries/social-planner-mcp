@@ -20,7 +20,9 @@ async function main() {
 
   console.warn(
     '\n⚠️  Seeding database with DEMO data including a default admin account ' +
-      '(admin@admin.com / admin). For local development only — never deploy with these credentials.\n'
+      '(admin@admin.com / admin). For local development only — never deploy with these credentials.\n' +
+      '\n   A read-only demo account (demo@planner.com / demo, role VIEWER, isDemo=true) is also ' +
+      'created. It is safe to expose publicly — the API rejects all write requests from it.\n'
   );
 
   console.log('Seeding database...');
@@ -85,7 +87,26 @@ async function main() {
     },
   });
 
-  console.log(`Created users: ${adminUser.email}, ${editorUser.email}, ${viewerUser.email}`);
+  // Public read-only demo account. Backed by the VIEWER role AND the isDemo
+  // flag, which the API uses to reject every write request (see blockDemoWrites
+  // in apps/api/src/middleware/auth.ts). Safe to expose publicly: it cannot
+  // change any data.
+  const demoPasswordHash = await bcrypt.hash('demo', 10);
+  const demoUser = await prisma.user.create({
+    data: {
+      email: 'demo@planner.com',
+      passwordHash: demoPasswordHash,
+      fullName: 'Demo User',
+      role: UserRole.VIEWER,
+      isDemo: true,
+      timezone: 'Europe/Amsterdam',
+      emailVerifiedAt: new Date(),
+    },
+  });
+
+  console.log(
+    `Created users: ${adminUser.email}, ${editorUser.email}, ${viewerUser.email}, ${demoUser.email} (read-only demo)`
+  );
 
   // NOTE: Social accounts are NOT seeded - they must be connected via OAuth in the app
   console.log('Skipping social accounts (connect via OAuth in app)...');
@@ -382,7 +403,7 @@ async function main() {
 
   console.log('Database seeded successfully!');
   console.log({
-    users: 3,
+    users: 4,
     socialAccounts: 2,
     folders: 3,
     tags: 3,

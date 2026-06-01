@@ -115,6 +115,7 @@ model User {
   authProvider    AuthProvider @default(LOCAL) @map("auth_provider")
   authProviderId  String?      @map("auth_provider_id")
   role            UserRole     @default(EDITOR)
+  isDemo          Boolean      @default(false) @map("is_demo")
   createdAt       DateTime     @default(now()) @map("created_at")
   lastLoginAt     DateTime?    @map("last_login_at")
 

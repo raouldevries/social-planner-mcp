@@ -4,6 +4,8 @@ A social media content planner for Instagram and LinkedIn that you can drive fro
 
 Built end-to-end with agentic coding as the primary workflow. The `memory-bank/` directory contains the full design docs, implementation plan, and session-by-session build journal used to drive Claude Code through the project.
 
+**Live demo:** [planner.soulkitchen.nl](https://planner.soulkitchen.nl) — view the app in demo mode.
+
 ![Calendar view](docs/screenshots/calendar.png)
 
 ---

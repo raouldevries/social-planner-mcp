@@ -1,0 +1,727 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`email template golden output > sendCollaboratorAddedEmail 1`] = `
+{
+  "html": "
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Added as Collaborator</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #374151;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f4f6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      margin-bottom: 24px;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 600;
+      color: #6366f1;
+      text-decoration: none;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 0 16px 0;
+    }
+    p {
+      margin: 0 0 16px 0;
+    }
+    .preview-box {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .preview-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .preview-text {
+      color: #374151;
+      margin: 0;
+    }
+    .button {
+      display: inline-block;
+      background: #6366f1;
+      color: white !important;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+    .button:hover {
+      background: #4f46e5;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 32px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+    .footer a {
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <span class="logo">Social Planner</span>
+      </div>
+
+      <h1>Added as Collaborator</h1>
+
+      <p>Hi Collab Carol,</p>
+
+      <p><strong>Owner Oscar</strong> added you as a collaborator on a post.</p>
+
+      <div class="preview-box">
+        <div class="preview-label">Post Preview</div>
+        <p class="preview-text">Draft: Q1 marketing roundup</p>
+      </div>
+
+      <p>Click the button below to view the post:</p>
+
+      <a href="http://localhost:5173/posts/xyz789" class="button">View Post</a>
+    </div>
+
+    <div class="footer">
+      <p>Sent via <a href="http://localhost:5173">Social Planner</a></p>
+    </div>
+  </div>
+</body>
+</html>
+",
+  "subject": "Owner Oscar added you as a collaborator",
+  "text": "
+Hi Collab Carol,
+
+Owner Oscar added you as a collaborator on a post.
+
+Post Preview:
+Draft: Q1 marketing roundup
+
+Click the link below to view the post:
+http://localhost:5173/posts/xyz789
+
+---
+Sent via Social Planner
+",
+  "to": "collab@example.com",
+}
+`;
+
+exports[`email template golden output > sendFeedbackReplyEmail 1`] = `
+{
+  "html": "
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Reply to Your Feedback</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #374151;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f4f6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      margin-bottom: 24px;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 600;
+      color: #6366f1;
+      text-decoration: none;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 0 16px 0;
+    }
+    p {
+      margin: 0 0 16px 0;
+    }
+    .content-box {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .content-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .content-text {
+      color: #374151;
+      margin: 0;
+    }
+    .reply-box {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      border-left: 4px solid #6366f1;
+    }
+    .button {
+      display: inline-block;
+      background: #6366f1;
+      color: white !important;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+    .button:hover {
+      background: #4f46e5;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 32px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+    .footer a {
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <span class="logo">Social Planner</span>
+      </div>
+
+      <h1>New Reply to Your Feedback</h1>
+
+      <p>Hi Test User,</p>
+
+      <p><strong>Admin Person</strong> replied to your feedback.</p>
+
+      <div class="content-box">
+        <div class="content-label">Your Feedback</div>
+        <p class="content-text">Something is broken on the calendar page</p>
+      </div>
+
+      <div class="reply-box">
+        <div class="content-label">Reply</div>
+        <p class="content-text">Thanks for reporting, we are looking into it</p>
+      </div>
+
+      <p>Click the button below to view the full conversation:</p>
+
+      <a href="http://localhost:5173/feedback" class="button">View Feedback</a>
+    </div>
+
+    <div class="footer">
+      <p>Sent via <a href="http://localhost:5173">Social Planner</a></p>
+    </div>
+  </div>
+</body>
+</html>
+",
+  "subject": "Admin Person replied to your feedback",
+  "text": "
+Hi Test User,
+
+Admin Person replied to your feedback.
+
+Your Feedback:
+Something is broken on the calendar page
+
+Reply:
+Thanks for reporting, we are looking into it
+
+View the full conversation:
+http://localhost:5173/feedback
+
+---
+Sent via Social Planner
+",
+  "to": "user@example.com",
+}
+`;
+
+exports[`email template golden output > sendInvitationEmail 1`] = `
+{
+  "html": "
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're Invited to Social Planner</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #374151;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f4f6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      margin-bottom: 24px;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 600;
+      color: #6366f1;
+      text-decoration: none;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 0 16px 0;
+    }
+    p {
+      margin: 0 0 16px 0;
+    }
+    .role-badge {
+      display: inline-block;
+      background: #eef2ff;
+      color: #4f46e5;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .button {
+      display: inline-block;
+      background: #6366f1;
+      color: white !important;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+    .button:hover {
+      background: #4f46e5;
+    }
+    .oauth-note {
+      margin-top: 16px;
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 32px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+    .footer a {
+      color: #6b7280;
+    }
+    .note {
+      margin-top: 24px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <span class="logo">Social Planner</span>
+      </div>
+
+      <h1>You're Invited!</h1>
+
+      <p>Hi,</p>
+
+      <p><strong>Inviter Ivan</strong> has invited you to join Social Planner as <span class="role-badge">an Editor</span>.</p>
+
+      <p>Click the button below to create your account:</p>
+
+      <a href="http://localhost:5173/invite/accept?token=inv-123" class="button">Accept Invitation</a>
+
+      <div class="oauth-note">
+        You can also sign in with Google or Microsoft using this email address (invitee@example.com).
+      </div>
+
+      <p class="note">
+        This invitation expires on Sunday, March 15, 2026. If you didn't expect this invitation, you can safely ignore this email.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>Sent via <a href="http://localhost:5173">Social Planner</a></p>
+    </div>
+  </div>
+</body>
+</html>
+",
+  "subject": "Inviter Ivan invited you to Social Planner",
+  "text": "
+Hi,
+
+Inviter Ivan has invited you to join Social Planner as an Editor.
+
+Click the link below to create your account:
+http://localhost:5173/invite/accept?token=inv-123
+
+You can also sign in with Google or Microsoft using this email address (invitee@example.com).
+
+This invitation expires on Sunday, March 15, 2026.
+
+If you didn't expect this invitation, you can safely ignore this email.
+
+---
+Sent via Social Planner
+",
+  "to": "invitee@example.com",
+}
+`;
+
+exports[`email template golden output > sendPasswordResetEmail 1`] = `
+{
+  "html": "
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Your Password</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #374151;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f4f6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      margin-bottom: 24px;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 600;
+      color: #6366f1;
+      text-decoration: none;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 0 16px 0;
+    }
+    p {
+      margin: 0 0 16px 0;
+    }
+    .button {
+      display: inline-block;
+      background: #6366f1;
+      color: white !important;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+    .button:hover {
+      background: #4f46e5;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 32px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+    .footer a {
+      color: #6b7280;
+    }
+    .note {
+      margin-top: 24px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <span class="logo">Social Planner</span>
+      </div>
+
+      <h1>Reset Your Password</h1>
+
+      <p>Hi,</p>
+
+      <p>We received a request to reset your password. Click the button below to choose a new password:</p>
+
+      <a href="http://localhost:5173/reset-password?token=tok-FIXED-123" class="button">Reset Password</a>
+
+      <p class="note">
+        This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>Sent via <a href="http://localhost:5173">Social Planner</a></p>
+    </div>
+  </div>
+</body>
+</html>
+",
+  "subject": "Reset your Social Planner password",
+  "text": "
+Hi,
+
+We received a request to reset your password for Social Planner.
+
+Click the link below to choose a new password:
+http://localhost:5173/reset-password?token=tok-FIXED-123
+
+This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.
+
+---
+Sent via Social Planner
+",
+  "to": "reset@example.com",
+}
+`;
+
+exports[`email template golden output > sendReviewRequestEmail 1`] = `
+{
+  "html": "
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Request</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #374151;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f4f6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      margin-bottom: 24px;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 600;
+      color: #6366f1;
+      text-decoration: none;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 0 16px 0;
+    }
+    p {
+      margin: 0 0 16px 0;
+    }
+    .message-box {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      border-left: 4px solid #6366f1;
+    }
+    .message-box p {
+      margin: 0;
+      font-style: italic;
+      color: #4b5563;
+    }
+    .preview-box {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .preview-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .preview-text {
+      color: #374151;
+      margin: 0;
+    }
+    .button {
+      display: inline-block;
+      background: #6366f1;
+      color: white !important;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+    .button:hover {
+      background: #4f46e5;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 32px;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+    .footer a {
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <span class="logo">Social Planner</span>
+      </div>
+
+      <h1>Review Request</h1>
+
+      <p>Hi Reviewer Rita,</p>
+
+      <p><strong>Author Alice</strong> has requested your feedback on a social media post.</p>
+
+      
+      <div class="message-box">
+        <p>"Please review by Friday."</p>
+      </div>
+      
+
+      <div class="preview-box">
+        <div class="preview-label">Post Preview</div>
+        <p class="preview-text">Check out our new product launch announcement!</p>
+      </div>
+
+      <p>Click the button below to view the full post and leave your comments:</p>
+
+      <a href="http://localhost:5173/review/abc123" class="button">Review Post</a>
+
+      <p style="margin-top: 24px; font-size: 14px; color: #6b7280;">
+        This link will expire in 30 days. If you have any questions, please contact Author Alice directly.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>Sent via <a href="http://localhost:5173">Social Planner</a></p>
+    </div>
+  </div>
+</body>
+</html>
+",
+  "subject": "Author Alice requested your review",
+  "text": "
+Hi Reviewer Rita,
+
+Author Alice has requested your feedback on a social media post.
+
+Message from Author Alice:
+"Please review by Friday."
+
+
+Post Preview:
+Check out our new product launch announcement!
+
+Click the link below to view the full post and leave your comments:
+http://localhost:5173/review/abc123
+
+This link will expire in 30 days.
+
+---
+Sent via Social Planner
+",
+  "to": "reviewer@example.com",
+}
+`;

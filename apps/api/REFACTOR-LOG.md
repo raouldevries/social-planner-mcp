@@ -20,6 +20,14 @@ and out of scope.
 | 1    | extract shared HTML scaffold → `renderEmailLayout()` (−56 lines)         | 128 ✅ | ✅  | ✅   | self (byte-identical, verified ×2) | a60de61   |
 | 2    | extract base CSS → `BASE_EMAIL_STYLES` const (DOCTYPE 5→1, base CSS 5→1) | 128 ✅ | ✅  | ✅   | self (byte-identical, verified ×2) | (pending) |
 
+| 3 | address `/code-review` findings (non-output-changing): pin TZ in vitest.config, fix false TZ comment, harden `lastEmail()` to `.at(-1)`, JSDoc `EmailLayoutOptions` contract | 128 ✅ (also green under TZ=Pacific/Fiji) | ✅ | ✅ | full `/code-review` (xhigh, 52 agents) | (pending) |
+
+## `/code-review` verdict (xhigh, 52 agents, 37 candidates → 15 verified)
+
+- **Refactor introduced ZERO correctness regressions.** Every CONFIRMED correctness finding (unescaped names #1/#4/#7, far-east date #2) is PRE-EXISTING and byte-identical to main (verifiers confirm). The python source-reconstruction proof guarantees byte-identical output for ALL inputs, not just the snapshotted happy-path (closes finding #5 for this change).
+- **Fixed in Step 3 (my own additions, no output change):** #3 test TZ fragility (comment was factually wrong — noon-UTC rolls in UTC+12/+13), #6/#9 undocumented `renderEmailLayout` content contract, #11 `lastEmail()` robustness.
+- **Surfaced, NOT fixed here (changing output violates byte-identical scope) → separate branch:** XSS — `senderName`/`addedByName`/`inviterName`/`postPreview` rendered unescaped in 3 of 5 templates while feedback escapes; far-east date-off-by-one (#2 source); centralize `escapeHtml`/`truncate` (#13/#14); within-template `.note` CSS dup (#15).
+
 ## Status @ Step 2 (checkpoint)
 
 - email.service.ts: **990 → 784 lines (−206, −21%)**. Major duplication (HTML scaffold + base CSS) ELIMINATED.

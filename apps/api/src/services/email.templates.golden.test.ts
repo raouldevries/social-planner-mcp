@@ -8,10 +8,16 @@
  * suite only exercised sendFeedbackReplyEmail (1 of 6 functions), leaving the
  * other templates with zero contract.
  *
- * Determinism: ../config is mocked to fixed values; the only Date input
- * (invitation expiresAt) is noon-UTC so toLocaleDateString('en-US') cannot roll
- * a calendar-day boundary across local timezones.
+ * Determinism: ../config is mocked to fixed values. The one Date input
+ * (invitation expiresAt) is formatted with toLocaleDateString('en-US') WITHOUT a
+ * timeZone option, so its rendered calendar day depends on the ambient timezone
+ * — noon-UTC still rolls to the next day in UTC+12/+13 zones (e.g. Auckland,
+ * Fiji). vitest.config.ts pins TZ=UTC (in the main process, before workers fork)
+ * so this snapshot is stable on every machine. (The underlying source arguably
+ * should pass { timeZone: 'UTC' } so far-east users see the right date, but that
+ * changes rendered output — out of scope for this byte-identical refactor.)
  */
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // vi.hoisted so the mock fn exists when vi.mock is hoisted above the imports.
@@ -54,7 +60,7 @@ import {
 
 /** The { to, subject, html, text } handed to the transport by the last send. */
 function lastEmail(): Record<string, unknown> {
-  const call = mockSendMail.mock.calls[0]?.[0] as Record<string, unknown>;
+  const call = mockSendMail.mock.calls.at(-1)?.[0] as Record<string, unknown>;
   return { to: call.to, subject: call.subject, html: call.html, text: call.text };
 }
 

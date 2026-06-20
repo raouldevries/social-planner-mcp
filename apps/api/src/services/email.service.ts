@@ -198,8 +198,16 @@ const BASE_EMAIL_STYLES = `
 `;
 
 interface EmailLayoutOptions {
+  /** Plain text for the <title> tag. Use a trusted constant, not user input. */
   title: string;
+  /** CSS injected raw inside <style>…</style>. Typically `${BASE_EMAIL_STYLES}` followed by template-specific rules. */
   styles: string;
+  /**
+   * HTML injected raw immediately after the header `</div>`. MUST begin with the
+   * `\n\n` blank-line separator (a leading newline before the first `<h1>`) to
+   * match the established spacing; the layout adds no separator of its own.
+   * Caller is responsible for HTML-escaping any user-controlled values here.
+   */
   content: string;
 }
 

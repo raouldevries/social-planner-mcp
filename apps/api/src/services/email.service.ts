@@ -157,6 +157,46 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
 /**
  * Send a review request email with a share link
  */
+const BASE_EMAIL_STYLES = `
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #374151;
+      margin: 0;
+      padding: 0;
+      background-color: #f3f4f6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      margin-bottom: 24px;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 600;
+      color: #6366f1;
+      text-decoration: none;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 0 16px 0;
+    }
+    p {
+      margin: 0 0 16px 0;
+    }
+`;
+
 interface EmailLayoutOptions {
   title: string;
   styles: string;
@@ -205,45 +245,7 @@ export async function sendReviewRequestEmail(data: ReviewRequestEmailData): Prom
 
   const html = renderEmailLayout({
     title: `Review Request`,
-    styles: `
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
-      color: #374151;
-      margin: 0;
-      padding: 0;
-      background-color: #f3f4f6;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 32px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      margin-bottom: 24px;
-    }
-    .logo {
-      font-size: 20px;
-      font-weight: 600;
-      color: #6366f1;
-      text-decoration: none;
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 600;
-      color: #111827;
-      margin: 0 0 16px 0;
-    }
-    p {
-      margin: 0 0 16px 0;
-    }
-    .message-box {
+    styles: `${BASE_EMAIL_STYLES}    .message-box {
       background: #f9fafb;
       border-radius: 8px;
       padding: 16px;
@@ -365,45 +367,7 @@ export async function sendCollaboratorAddedEmail(data: CollaboratorEmailData): P
 
   const html = renderEmailLayout({
     title: `Added as Collaborator`,
-    styles: `
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
-      color: #374151;
-      margin: 0;
-      padding: 0;
-      background-color: #f3f4f6;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 32px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      margin-bottom: 24px;
-    }
-    .logo {
-      font-size: 20px;
-      font-weight: 600;
-      color: #6366f1;
-      text-decoration: none;
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 600;
-      color: #111827;
-      margin: 0 0 16px 0;
-    }
-    p {
-      margin: 0 0 16px 0;
-    }
-    .preview-box {
+    styles: `${BASE_EMAIL_STYLES}    .preview-box {
       background: #f9fafb;
       border-radius: 8px;
       padding: 16px;
@@ -493,45 +457,7 @@ export async function sendPasswordResetEmail(email: string, resetToken: string):
 
   const html = renderEmailLayout({
     title: `Reset Your Password`,
-    styles: `
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
-      color: #374151;
-      margin: 0;
-      padding: 0;
-      background-color: #f3f4f6;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 32px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      margin-bottom: 24px;
-    }
-    .logo {
-      font-size: 20px;
-      font-weight: 600;
-      color: #6366f1;
-      text-decoration: none;
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 600;
-      color: #111827;
-      margin: 0 0 16px 0;
-    }
-    p {
-      margin: 0 0 16px 0;
-    }
-    .button {
+    styles: `${BASE_EMAIL_STYLES}    .button {
       display: inline-block;
       background: #6366f1;
       color: white !important;
@@ -612,45 +538,7 @@ export async function sendInvitationEmail(data: InvitationEmailData): Promise<bo
 
   const html = renderEmailLayout({
     title: `You're Invited to Social Planner`,
-    styles: `
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
-      color: #374151;
-      margin: 0;
-      padding: 0;
-      background-color: #f3f4f6;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 32px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      margin-bottom: 24px;
-    }
-    .logo {
-      font-size: 20px;
-      font-weight: 600;
-      color: #6366f1;
-      text-decoration: none;
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 600;
-      color: #111827;
-      margin: 0 0 16px 0;
-    }
-    p {
-      margin: 0 0 16px 0;
-    }
-    .role-badge {
+    styles: `${BASE_EMAIL_STYLES}    .role-badge {
       display: inline-block;
       background: #eef2ff;
       color: #4f46e5;
@@ -773,45 +661,7 @@ export async function sendFeedbackReplyEmail(data: FeedbackReplyEmailData): Prom
 
   const html = renderEmailLayout({
     title: `New Reply to Your Feedback`,
-    styles: `
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.6;
-      color: #374151;
-      margin: 0;
-      padding: 0;
-      background-color: #f3f4f6;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 32px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      margin-bottom: 24px;
-    }
-    .logo {
-      font-size: 20px;
-      font-weight: 600;
-      color: #6366f1;
-      text-decoration: none;
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 600;
-      color: #111827;
-      margin: 0 0 16px 0;
-    }
-    p {
-      margin: 0 0 16px 0;
-    }
-    .content-box {
+    styles: `${BASE_EMAIL_STYLES}    .content-box {
       background: #f9fafb;
       border-radius: 8px;
       padding: 16px;

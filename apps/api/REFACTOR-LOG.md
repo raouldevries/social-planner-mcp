@@ -14,6 +14,7 @@ and out of scope.
 · `eslint` · `/code-review` (block commit on P0/P1).
 **Stop:** duplication gone AND all gates green AND review clean, OR 7 steps.
 
-| Step | Change                                                         | vitest | tsc | lint | review           | commit    |
-| ---- | -------------------------------------------------------------- | ------ | --- | ---- | ---------------- | --------- |
-| 0    | golden snapshots for all 5 templates (coverage-first contract) | 128 ✅ | ✅  | ✅   | self (test-only) | (pending) |
+| Step | Change                                                           | vitest | tsc | lint | review                             | commit    |
+| ---- | ---------------------------------------------------------------- | ------ | --- | ---- | ---------------------------------- | --------- |
+| 0    | golden snapshots for all 5 templates (coverage-first contract)   | 128 ✅ | ✅  | ✅   | self (test-only)                   | 128e71c   |
+| 1    | extract shared HTML scaffold → `renderEmailLayout()` (−56 lines) | 128 ✅ | ✅  | ✅   | self (byte-identical, verified ×2) | (pending) |

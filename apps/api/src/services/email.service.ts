@@ -157,6 +157,45 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
 /**
  * Send a review request email with a share link
  */
+interface EmailLayoutOptions {
+  title: string;
+  styles: string;
+  content: string;
+}
+
+/**
+ * Shared HTML scaffold for every transactional email. The doctype, <head>,
+ * card/header wrapper and footer are identical across all templates; only the
+ * title, <style> rules and inner content differ. Output is byte-for-byte
+ * identical to the previous inline templates (locked by golden snapshots).
+ */
+function renderEmailLayout(opts: EmailLayoutOptions): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${opts.title}</title>
+  <style>${opts.styles}</style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <span class="logo">Social Planner</span>
+      </div>${opts.content}
+    </div>
+
+    <div class="footer">
+      <p>Sent via <a href="${config.FRONTEND_URL}">Social Planner</a></p>
+    </div>
+  </div>
+</body>
+</html>
+`;
+}
+
 export async function sendReviewRequestEmail(data: ReviewRequestEmailData): Promise<boolean> {
   const { recipientEmail, recipientName, senderName, postPreview, reviewUrl, message } = data;
 
@@ -164,14 +203,9 @@ export async function sendReviewRequestEmail(data: ReviewRequestEmailData): Prom
   const truncatedPreview =
     postPreview.length > 150 ? postPreview.substring(0, 150) + '...' : postPreview;
 
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Review Request</title>
-  <style>
+  const html = renderEmailLayout({
+    title: `Review Request`,
+    styles: `
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
@@ -261,14 +295,8 @@ export async function sendReviewRequestEmail(data: ReviewRequestEmailData): Prom
     .footer a {
       color: #6b7280;
     }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <span class="logo">Social Planner</span>
-      </div>
+  `,
+    content: `
 
       <h1>Review Request</h1>
 
@@ -297,16 +325,8 @@ export async function sendReviewRequestEmail(data: ReviewRequestEmailData): Prom
 
       <p style="margin-top: 24px; font-size: 14px; color: #6b7280;">
         This link will expire in 30 days. If you have any questions, please contact ${senderName} directly.
-      </p>
-    </div>
-
-    <div class="footer">
-      <p>Sent via <a href="${config.FRONTEND_URL}">Social Planner</a></p>
-    </div>
-  </div>
-</body>
-</html>
-`;
+      </p>`,
+  });
 
   const text = `
 ${greeting},
@@ -343,14 +363,9 @@ export async function sendCollaboratorAddedEmail(data: CollaboratorEmailData): P
   const truncatedPreview =
     postPreview.length > 150 ? postPreview.substring(0, 150) + '...' : postPreview;
 
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Added as Collaborator</title>
-  <style>
+  const html = renderEmailLayout({
+    title: `Added as Collaborator`,
+    styles: `
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
@@ -428,14 +443,8 @@ export async function sendCollaboratorAddedEmail(data: CollaboratorEmailData): P
     .footer a {
       color: #6b7280;
     }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <span class="logo">Social Planner</span>
-      </div>
+  `,
+    content: `
 
       <h1>Added as Collaborator</h1>
 
@@ -450,16 +459,8 @@ export async function sendCollaboratorAddedEmail(data: CollaboratorEmailData): P
 
       <p>Click the button below to view the post:</p>
 
-      <a href="${postUrl}" class="button">View Post</a>
-    </div>
-
-    <div class="footer">
-      <p>Sent via <a href="${config.FRONTEND_URL}">Social Planner</a></p>
-    </div>
-  </div>
-</body>
-</html>
-`;
+      <a href="${postUrl}" class="button">View Post</a>`,
+  });
 
   const text = `
 Hi ${recipientName},
@@ -490,14 +491,9 @@ Sent via Social Planner
 export async function sendPasswordResetEmail(email: string, resetToken: string): Promise<boolean> {
   const resetUrl = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reset Your Password</title>
-  <style>
+  const html = renderEmailLayout({
+    title: `Reset Your Password`,
+    styles: `
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
@@ -562,14 +558,8 @@ export async function sendPasswordResetEmail(email: string, resetToken: string):
       font-size: 14px;
       color: #6b7280;
     }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <span class="logo">Social Planner</span>
-      </div>
+  `,
+    content: `
 
       <h1>Reset Your Password</h1>
 
@@ -581,16 +571,8 @@ export async function sendPasswordResetEmail(email: string, resetToken: string):
 
       <p class="note">
         This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.
-      </p>
-    </div>
-
-    <div class="footer">
-      <p>Sent via <a href="${config.FRONTEND_URL}">Social Planner</a></p>
-    </div>
-  </div>
-</body>
-</html>
-`;
+      </p>`,
+  });
 
   const text = `
 Hi,
@@ -628,14 +610,9 @@ export async function sendInvitationEmail(data: InvitationEmailData): Promise<bo
     day: 'numeric',
   });
 
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>You're Invited to Social Planner</title>
-  <style>
+  const html = renderEmailLayout({
+    title: `You're Invited to Social Planner`,
+    styles: `
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
@@ -717,14 +694,8 @@ export async function sendInvitationEmail(data: InvitationEmailData): Promise<bo
       font-size: 14px;
       color: #6b7280;
     }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <span class="logo">Social Planner</span>
-      </div>
+  `,
+    content: `
 
       <h1>You're Invited!</h1>
 
@@ -742,16 +713,8 @@ export async function sendInvitationEmail(data: InvitationEmailData): Promise<bo
 
       <p class="note">
         This invitation expires on ${expiryDate}. If you didn't expect this invitation, you can safely ignore this email.
-      </p>
-    </div>
-
-    <div class="footer">
-      <p>Sent via <a href="${config.FRONTEND_URL}">Social Planner</a></p>
-    </div>
-  </div>
-</body>
-</html>
-`;
+      </p>`,
+  });
 
   const text = `
 Hi,
@@ -808,14 +771,9 @@ export async function sendFeedbackReplyEmail(data: FeedbackReplyEmailData): Prom
   const safeFeedback = escapeHtml(truncate(feedbackContent, 200));
   const safeReply = escapeHtml(truncate(replyContent, 200));
 
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Reply to Your Feedback</title>
-  <style>
+  const html = renderEmailLayout({
+    title: `New Reply to Your Feedback`,
+    styles: `
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
@@ -900,14 +858,8 @@ export async function sendFeedbackReplyEmail(data: FeedbackReplyEmailData): Prom
     .footer a {
       color: #6b7280;
     }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="card">
-      <div class="header">
-        <span class="logo">Social Planner</span>
-      </div>
+  `,
+    content: `
 
       <h1>New Reply to Your Feedback</h1>
 
@@ -927,16 +879,8 @@ export async function sendFeedbackReplyEmail(data: FeedbackReplyEmailData): Prom
 
       <p>Click the button below to view the full conversation:</p>
 
-      <a href="${feedbackUrl}" class="button">View Feedback</a>
-    </div>
-
-    <div class="footer">
-      <p>Sent via <a href="${config.FRONTEND_URL}">Social Planner</a></p>
-    </div>
-  </div>
-</body>
-</html>
-`;
+      <a href="${feedbackUrl}" class="button">View Feedback</a>`,
+  });
 
   const text = `
 Hi ${recipientName},
